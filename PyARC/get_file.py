@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 class CSVHandler:
@@ -18,9 +19,16 @@ class CSVHandler:
         if self.data is not None:
             print(self.data)
         else:
-            print("Load the CSV file first using the load_csv method.")
+            print("No data loaded. Call load_csv first.")
+
+# Calcola il percorso completo al file
+file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
+file_path = os.path.join(file_directory, "default_data.csv")
 
 # Using the class
-csv_handler = CSVHandler("default_data.csv")
+csv_handler = CSVHandler(file_path)
+
+# Chiamata a load_csv prima di display_data
 csv_handler.load_csv()
 csv_handler.display_data()
+
