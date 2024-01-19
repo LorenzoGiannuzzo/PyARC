@@ -1,2 +1,2 @@
 # PyARC
-PyARC Software - 
+PyARC Software - Python Algorythm for Residential load profiles reConstruction
