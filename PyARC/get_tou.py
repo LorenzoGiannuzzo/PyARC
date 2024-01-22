@@ -16,21 +16,5 @@ class CSVHandler:
         except Exception as e:
             print(f"Error loading the file '{self.file_path}': {e}")
 
-    def display_data(self):
-        if self.data is not None:
-            # Display the loaded data (DataFrame)
-            print(self.data)
-        else:
-            print("No data loaded. Call load_csv first.")
-
-# Calculate the full path to the file
-file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
-file_path = os.path.join(file_directory, "default_tou.csv")
-
-# Using the class
-csv_handler = CSVHandler(file_path)
-
-# Call load_csv before display_data
-csv_handler.load_csv()
-csv_handler.display_data()
-
+    def get_data(self):
+        return self.data
