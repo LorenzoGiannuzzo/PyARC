@@ -32,7 +32,13 @@ class PyARC:
         corrected_data = data_processor.get_negative_values()
         corrected_data = DataPreprocessing.replace_max_daily_zero_consumption(corrected_data)
 
-        corrected_data = DataPreprocessing.process_outliers(corrected_data)
+        corrected_data = DataPreprocessing.interpolate_missing_values(corrected_data,max_gap=3)
+        corrected_data = DataPreprocessing.fill_missing_values_with_monthly_mean(corrected_data)
+
+        corrected_data = DataPreprocessing.remove_outliers_iqr(corrected_data)
+
+        corrected_data = DataPreprocessing.interpolate_missing_values(corrected_data, max_gap=3)
+        corrected_data = DataPreprocessing.fill_missing_values_with_monthly_mean(corrected_data)
 
         # Return the obtained DataFrames
         return corrected_data
