@@ -19,10 +19,16 @@ class PyARC:
 
         data = DataFrameProcessor(data_dataframe)
         data = data.process_dataframe()
+
+        DataFrameProcessor.check_tou(tou_dataframe)
+
+        data_summer, data_winter, data_spring, data_autumn = DataFrameProcessor.data_subset(data)
+
+
 #devo fare il check anche sul tou
 
         # Return the obtained DataFrames
-        return data, tou_dataframe
+        return data_summer, data_winter, data_spring, data_autumn
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
@@ -35,5 +41,4 @@ if __name__ == "__main__":
 
     # Create an instance of PyARC and call train_model
     pyarc_instance = PyARC()
-    data, tou = pyarc_instance.train_model(data_file_path, tou_file_path)
-
+    data_summer, data_winter, data_spring, data_autumn = pyarc_instance.train_model(data_file_path, tou_file_path)
