@@ -3,6 +3,7 @@ import os
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
+from data_preprocessing import DataPreprocessing
 
 # Define PyARC class
 class PyARC:
@@ -24,11 +25,16 @@ class PyARC:
 
         data_summer, data_winter, data_spring, data_autumn = DataFrameProcessor.data_subset(data)
 
+        # Creating a DataPreprocessing object
+        data_processor = DataPreprocessing(data)
+
+        # Calling the get_negative_values function
+        corrected_data = data_processor.get_negative_values()
 
 #devo fare il check anche sul tou
 
         # Return the obtained DataFrames
-        return data_summer, data_winter, data_spring, data_autumn
+        return corrected_data
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
@@ -41,4 +47,5 @@ if __name__ == "__main__":
 
     # Create an instance of PyARC and call train_model
     pyarc_instance = PyARC()
-    data_summer, data_winter, data_spring, data_autumn = pyarc_instance.train_model(data_file_path, tou_file_path)
+    corrected_data = pyarc_instance.train_model(data_file_path, tou_file_path)
+
