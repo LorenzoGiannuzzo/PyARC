@@ -30,8 +30,9 @@ class PyARC:
 
         # Calling the get_negative_values function
         corrected_data = data_processor.get_negative_values()
+        corrected_data = DataPreprocessing.replace_max_daily_zero_consumption(corrected_data)
 
-#devo fare il check anche sul tou
+        corrected_data = DataPreprocessing.process_outliers(corrected_data)
 
         # Return the obtained DataFrames
         return corrected_data
