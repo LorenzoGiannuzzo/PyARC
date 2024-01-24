@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.metrics import davies_bouldin_score
 
 class DataPreprocessing:
     def __init__(self, dataframe):
@@ -89,6 +91,64 @@ class DataPreprocessing:
         df[column_name] = df[column_name].apply(lambda x: x if lower_bound <= x <= upper_bound else None)
 
         return df
+
+    import pandas as pd
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import davies_bouldin_score
+
+    def infrequent_profiles(dataframe):
+        # Filtraggio del dataframe per ogni "Dayname"
+        unique_daynames = dataframe['Dayname'].unique()
+
+        for dayname in unique_daynames:
+            day_data = dataframe[dataframe['Dayname'] == dayname].copy()
+
+            # Inizializzazione delle variabili per il numero di cluster e il valore minimo di Davies-Bouldin
+            best_num_clusters = None
+            min_davies_bouldin = float('inf')
+
+            # Iterazione attraverso il numero di cluster da 7 a 20
+            for num_clusters in range(7, 21):
+                # Esecuzione del clustering k-means
+                kmeans = KMeans(n_clusters=num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
+                day_data['Cluster'] = kmeans.fit_predict(day_data[['Norm_consumption']])
+
+                # Calcolo dell'indice di Davies-Bouldin
+                davies_bouldin = davies_bouldin_score(day_data[['Norm_consumption']], day_data['Cluster'])
+
+                # Se l'indice di Davies-Bouldin è minore del valore minimo trovato finora, aggiorna i valori
+                if davies_bouldin < min_davies_bouldin:
+                    min_davies_bouldin = davies_bouldin
+                    best_num_clusters = num_clusters
+
+            # Esecuzione del clustering k-means con il numero ottimale di cluster
+            kmeans = KMeans(n_clusters=best_num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
+            day_data['Cluster'] = kmeans.fit_predict(day_data[['Norm_consumption']])
+
+            # Controlla se la colonna 'Cluster' è presente nel DataFrame prima di eseguire operazioni su di essa
+            if 'Cluster' in day_data.columns:
+                # Conteggio del numero di profili giornalieri e utenti unici in ogni cluster
+                cluster_counts = day_data['Cluster'].value_counts()
+                unique_users_in_clusters = day_data.groupby('Cluster')['User'].nunique()
+
+                # Filtraggio dei cluster poco popolati
+                filtered_clusters = cluster_counts[
+                    (cluster_counts >= 0.05 * len(day_data)) &  # almeno il 5% del numero totale di profili giornalieri
+                    (unique_users_in_clusters >= 0.05 * len(day_data['User'].unique()))
+                    # almeno il 5% del numero totale di utenti unici
+                    ].index
+
+                # Applicazione del filtro al dataframe
+                # Controlla se la colonna 'Cluster' è presente nel DataFrame prima di eseguire operazioni su di essa
+                if 'Cluster' in dataframe.columns:
+                    # Applicazione del filtro al dataframe
+                    dataframe = dataframe[
+                        (dataframe['Dayname'] != dayname) | (dataframe['Cluster'].isin(filtered_clusters))]
+
+        return dataframe
+
+
+
 
 
 

@@ -1,9 +1,12 @@
 # Import necessary modules
 import os
+from sklearn.cluster import KMeans
+from sklearn.metrics import davies_bouldin_score
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
 from data_preprocessing import DataPreprocessing
+from data_normalization import DataNormalization
 
 # Define PyARC class
 class PyARC:
@@ -23,8 +26,6 @@ class PyARC:
 
         DataFrameProcessor.check_tou(tou_dataframe)
 
-        data_summer, data_winter, data_spring, data_autumn = DataFrameProcessor.data_subset(data)
-
         # Creating a DataPreprocessing object
         data_processor = DataPreprocessing(data)
 
@@ -40,8 +41,15 @@ class PyARC:
         corrected_data = DataPreprocessing.interpolate_missing_values(corrected_data, max_gap=3)
         corrected_data = DataPreprocessing.fill_missing_values_with_monthly_mean(corrected_data)
 
-        # Return the obtained DataFrames
-        return corrected_data
+
+        data_normalizer = DataNormalization(corrected_data)
+        corrected_data = data_normalizer.normalize_consumption()
+
+        data_summer, data_winter, data_spring, data_autumn = DataFrameProcessor.data_subset(corrected_data)
+
+        data_summer_2 = DataPreprocessing.infrequent_profiles(data_summer)
+
+        return data_summer_2
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
