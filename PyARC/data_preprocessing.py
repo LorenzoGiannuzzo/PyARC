@@ -3,9 +3,14 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
 
+# This script contains all the function used to pre-process the data in order to eliminate outliers,
+# negative and missing values
+
 class DataPreprocessing:
     def __init__(self, dataframe):
         self.dataframe = dataframe
+
+# get_negative_values is the function used to eliminate negative consumption values within the data
 
     def get_negative_values(self):
         # Check if the "Consumption" column exists in the dataframe
@@ -17,8 +22,7 @@ class DataPreprocessing:
             print("The 'Consumption' column is not present in the dataframe.")
             return None
 
-    import pandas as pd
-    import numpy as np
+    # replace_max_daily_zero_consumption is the function used to eliminate flat profiles that havee max daily values equal to 0
 
     def replace_max_daily_zero_consumption(dataframe):
 
@@ -30,6 +34,8 @@ class DataPreprocessing:
         dataframe.loc[max_zero_profiles, "Consumption"] = np.nan
 
         return dataframe
+
+    #
 
     def interpolate_missing_values(df, max_gap=3):
             # Ordina il DataFrame in base a "User", "Year", "Month" e "Day"
