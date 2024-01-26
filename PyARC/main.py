@@ -45,11 +45,13 @@ class PyARC:
         data_normalizer = DataNormalization(corrected_data)
         corrected_data = data_normalizer.normalize_consumption()
 
+        corrected_data = DataPreprocessing.filter_users(corrected_data)
+
         data_summer, data_winter, data_spring, data_autumn = DataFrameProcessor.data_subset(corrected_data)
 
-        data_summer_2 = DataPreprocessing.infrequent_profiles(data_summer)
+       # data_summer2 = DataPreprocessing.infrequent_profiles(data_summer)  -> lo tengo in stand_by per adesso
 
-        return data_summer_2
+        return corrected_data
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":

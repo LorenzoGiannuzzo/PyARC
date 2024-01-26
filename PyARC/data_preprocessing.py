@@ -64,57 +64,83 @@ class DataPreprocessing:
         upper_bound = q3 + 1.5 * iqr
         df[column_name] = df[column_name].apply(lambda x: x if lower_bound <= x <= upper_bound else None)
         return df
+    @staticmethod
+    def filter_users(df):
+        df = df.sort_values(by=["User", "Year", "Month", "Day"])
+        # Converti la colonna "Hour" in valori numerici se non è già di tipo numerico
+        if not pd.api.types.is_numeric_dtype(df['Hour']):
+            df['Hour'] = pd.to_numeric(df['Hour'], errors='coerce')
+
+        # Group by "User", "Year", "Month", "Day" and check if all hours from 0 to 23 are present
+        valid_users_series = df.groupby(["User", "Year", "Month", "Day"])["Hour"].apply(
+            lambda x: set(x) == set(range(24)))
+
+        # Creazione di un nuovo DataFrame con le colonne "User", "Year", "Month", "Day", "Valid"
+        valid_df = pd.DataFrame(valid_users_series).reset_index()
+        valid_df.columns = ["User", "Year", "Month", "Day", "Valid"]
+
+        # Filtraggio del DataFrame in base agli utenti validi
+        filtered_df = df[df["User"].isin(valid_df[valid_df["Valid"]]["User"])]
+
+        # Calcolo del numero di utenti eliminati
+        num_users_eliminated = len(df["User"].unique()) - len(filtered_df["User"].unique())
+
+        # Output message
+        print(f"{num_users_eliminated} users eliminated. DataFrame processed successfully.")
+
+        return filtered_df
+
 
     @staticmethod
     def infrequent_profiles(df):
-        # Creazione del DataFrame risultato
-        df_result = pd.DataFrame()
+        # Inizializza il dataframe risultante
+        result_df = pd.DataFrame()
 
-        # Iterazione su ogni mese
-        for month in df['Month'].unique():
-            # Filtraggio del DataFrame per il mese specifico
-            df_month = df[df['Month'] == month]
+        # Itera per ogni giorno della settimana (Dayname)
+        for dayname in df['Dayname'].unique():
+            # Filtra il dataframe per il giorno della settimana corrente
+            day_df = df[df['Dayname'] == dayname]
 
-            # Raggruppamento per "Year", "Month", e "Day" per ottenere il profilo giornaliero
-            df_grouped = df_month.groupby(['Year', 'Month', 'Day']).agg({
-                'User': 'nunique',
-                'Norm_consumption': list
-            }).reset_index()
+            # Raggruppa per "Year", "Month", "Day" e ottieni i profili di carico giornalieri
+            daily_profiles = day_df.groupby(["Year", "Month", "Day"])["Norm_consumption"].apply(list).reset_index()
 
-            # Converte la lista di consumi in colonne separate
-            consumption_columns = pd.DataFrame(df_grouped['Norm_consumption'].tolist(), index=df_grouped.index)
-            consumption_columns.columns = ['Hour_{}'.format(i) for i in range(24)]
-            df_grouped = pd.concat([df_grouped, consumption_columns], axis=1)
+            # Inizializza variabili per l'ottimizzazione del numero di cluster
+            best_num_clusters = None
+            best_dbi_score = float('inf')
 
-            # Seleziona solo le colonne dei consumi orari per il clustering
-            features = df_grouped.iloc[:, 3:]
-
-            # Prova diverse configurazioni di numero di cluster e calcola l'indice di Davies-Bouldin
-            best_davies_bouldin = float('inf')
-            best_num_clusters = 0
-
+            # Prova il clustering con un numero di cluster variabile da 7 a 20
             for num_clusters in range(7, 21):
-                kmeans = KMeans(n_clusters=num_clusters, algorithm='lloyd', random_state=42)
-                labels = kmeans.fit_predict(features)
-                db_score = davies_bouldin_score(features, labels)
+                kmeans = KMeans(n_clusters=num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
+                clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
 
-                if db_score < best_davies_bouldin:
-                    best_davies_bouldin = db_score
+                # Calcola il Davies-Bouldin Index
+                dbi_score = davies_bouldin_score(list(daily_profiles["Norm_consumption"]), clusters)
+
+                # Aggiorna il miglior numero di cluster se necessario
+                if dbi_score < best_dbi_score:
+                    best_dbi_score = dbi_score
                     best_num_clusters = num_clusters
 
-            # Esegui il clustering con il numero ottimale di cluster
-            kmeans = KMeans(n_clusters=best_num_clusters, algorithm='lloyd', random_state=42)
-            df_grouped['Cluster'] = kmeans.fit_predict(features)
+            # Esegui nuovamente il clustering con il numero ottimale di cluster
+            kmeans = KMeans(n_clusters=best_num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
+            clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
 
-            # Controlla il numero di utenti e profili giornalieri nei cluster e filtra
-            cluster_counts = df_grouped['Cluster'].value_counts(normalize=True)
-            valid_clusters = cluster_counts[cluster_counts >= 0.05].index.tolist()
-            df_grouped_filtered = df_grouped[df_grouped['Cluster'].isin(valid_clusters)]
+            # Calcola il massimo numero di utenti e profili di carico giornalieri
+            max_users = df["User"].nunique()
+            max_profiles = len(df["Norm_consumption"])
 
-            # Aggiungi il risultato al DataFrame risultato
-            df_result = pd.concat([df_result, df_grouped_filtered])
+            # Identifica i cluster poco popolati
+            low_populated_clusters = []
+            for cluster_id in range(best_num_clusters):
+                cluster_users = day_df[clusters == cluster_id]["User"].nunique()
+                cluster_profiles = sum(clusters == cluster_id)
+                if cluster_users < 0.05 * max_users or cluster_profiles < 0.05 * max_profiles:
+                    low_populated_clusters.append(cluster_id)
 
-        # Rimuovi la colonna 'Cluster' dal DataFrame risultato
-        df_result = df_result.drop(columns=['Cluster'])
+            # Escludi i profili di carico giornalieri associati ai cluster poco popolati
+            updated_day_df = day_df[~clusters.isin(low_populated_clusters)]
 
-        return df_result
+            # Aggiorna il dataframe risultante
+            result_df = pd.concat([result_df, updated_day_df])
+
+        return result_df
