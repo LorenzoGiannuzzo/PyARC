@@ -3,6 +3,7 @@ import os
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
@@ -56,30 +57,43 @@ class PyARC:
 
         result_df, centroids = kmeans_clustering(corrected_data)
 
-        merged_df = pd.merge(result_df, centroids, on='Cluster', how='left', suffixes=('_original', '_centroid'))
+        result_df['Hour'] = pd.to_numeric(result_df['Hour'])
 
-        # Plot dei cluster e dei centroidi
-        for cluster in merged_df['Cluster'].unique():
-            cluster_data = merged_df[merged_df['Cluster'] == cluster]
+        # Creazione della griglia di lineplot
+        g = sns.FacetGrid(result_df, col="Cluster", col_wrap=3, height=4, sharey=False, margin_titles=True)
 
-            plt.figure(figsize=(8, 5))
+        # Map su tutti i profili di carico giornalieri, impostando il colore a grigio
+        g.map_dataframe(sns.lineplot, x="Hour", y="Norm_consumption", hue="User", alpha=0.3)
 
-            # Plot dei consumi originali
-            plt.scatter(cluster_data['Hour_original'], cluster_data['Norm_consumption_original'], label='Original Data',
-                        color='blue')
+        # Impostazioni estetiche
+        g.set_axis_labels("Hour", "Norm_consumption")
+        g.set_titles(col_template="Cluster {col_name}")
+        g.fig.suptitle("Lineplot for each Cluster", y=1.02)
 
-            # Plot dei centroidi
-            centroid_data = centroids[centroids['Cluster'] == cluster]
-            plt.scatter(centroid_data['Hour'], centroid_data['Norm_consumption'], label='Centroid', color='red',
-                        marker='x', s=100)
 
-            plt.title(f'Cluster {cluster} - Original vs Centroid')
-            plt.xlabel('Hour')
-            plt.ylabel('Norm_consumption')
-            plt.legend()
-            plt.show()
+        # Impostazione della scala uniforme sulle y
+        g.set(ylim=(0, 1))
 
-        return result_df, centroids
+        plt.show()
+
+        # cluster_colors = {1: 'blue', 2: 'green', 3: 'red', 4: 'yellow', 5: 'grey'}  # Puoi estendere questo dizionario in base ai tuoi dati effettivi
+        #
+        # # Creazione di una griglia di line plot per ogni cluster
+        # g = sns.FacetGrid(result_df, col="Cluster", col_wrap=3, height=4, sharey=False, margin_titles=True,
+        #                   palette=cluster_colors)
+        # g.map(sns.lineplot, "Hour", "Norm_consumption", sort=False)
+        #
+        # # Impostazioni estetiche
+        # g.set_axis_labels("Hour", "Norm_consumption")
+        # g.set_titles(col_template="{col_name}")
+        # g.fig.suptitle("Line Plot per Cluster", y=1.02)
+        #
+        # # Impostazione della scala uniforme sulle y
+        # g.set(ylim=(0, 1))
+        #
+        # plt.show()
+
+        return result_df
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
