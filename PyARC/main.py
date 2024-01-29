@@ -2,11 +2,14 @@
 import os
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
+import pandas as pd
+import matplotlib.pyplot as plt
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
 from data_preprocessing import DataPreprocessing
 from data_normalization import DataNormalization
+from data_clustering import kmeans_clustering
 
 # Define PyARC class
 class PyARC:
@@ -51,7 +54,32 @@ class PyARC:
 
        # data_summer2 = DataPreprocessing.infrequent_profiles(data_summer)  -> lo tengo in stand_by per adesso
 
-        return corrected_data
+        result_df, centroids = kmeans_clustering(corrected_data)
+
+        merged_df = pd.merge(result_df, centroids, on='Cluster', how='left', suffixes=('_original', '_centroid'))
+
+        # Plot dei cluster e dei centroidi
+        for cluster in merged_df['Cluster'].unique():
+            cluster_data = merged_df[merged_df['Cluster'] == cluster]
+
+            plt.figure(figsize=(8, 5))
+
+            # Plot dei consumi originali
+            plt.scatter(cluster_data['Hour_original'], cluster_data['Norm_consumption_original'], label='Original Data',
+                        color='blue')
+
+            # Plot dei centroidi
+            centroid_data = centroids[centroids['Cluster'] == cluster]
+            plt.scatter(centroid_data['Hour'], centroid_data['Norm_consumption'], label='Centroid', color='red',
+                        marker='x', s=100)
+
+            plt.title(f'Cluster {cluster} - Original vs Centroid')
+            plt.xlabel('Hour')
+            plt.ylabel('Norm_consumption')
+            plt.legend()
+            plt.show()
+
+        return result_df, centroids
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
