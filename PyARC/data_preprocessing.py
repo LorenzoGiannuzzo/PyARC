@@ -89,7 +89,18 @@ class DataPreprocessing:
         print(f"{num_users_eliminated} users eliminated. DataFrame processed successfully.")
 
         return filtered_df
+    @staticmethod
+    def monthly_average_consumption(dataframe):
+        # Create a copy of the input DataFrame
+        result_df = dataframe.copy()
 
+        # Group the DataFrame by User, Year, and Month
+        grouped_df = result_df.groupby(["User", "Year", "Month", "Hour"])
+
+        # Calculate the monthly average normalized consumption
+        result_df["M_consumption"] = grouped_df["Consumption"].transform("mean")
+
+        return result_df
 
     @staticmethod
     def infrequent_profiles(df):
