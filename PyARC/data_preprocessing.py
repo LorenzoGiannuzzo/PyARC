@@ -98,9 +98,17 @@ class DataPreprocessing:
         grouped_df = result_df.groupby(["User", "Year", "Month", "Hour"])
 
         # Calculate the monthly average normalized consumption
-        result_df["M_consumption"] = grouped_df["Consumption"].transform("mean")
+        result_df["M_consumption"] = grouped_df["Norm_consumption"].transform("mean")
 
         return result_df
+
+    @staticmethod
+    def reshape_dataframe(input_df):
+        # Raggruppa il dataframe per le colonne 'User', 'Year', 'Month'
+        grouped_df = input_df.groupby(['User', 'Year', 'Month','Hour'])['M_consumption'].mean().reset_index()
+
+        return grouped_df
+
 
     @staticmethod
     def infrequent_profiles(df):

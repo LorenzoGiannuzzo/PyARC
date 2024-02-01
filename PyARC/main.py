@@ -10,6 +10,7 @@ from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
 from data_preprocessing import DataPreprocessing
 from data_normalization import DataNormalization
+from plots import Plots
 from data_clustering import kmeans_clustering
 
 # Define PyARC class
@@ -57,27 +58,11 @@ class PyARC:
 
         corrected_data = DataPreprocessing.monthly_average_consumption(corrected_data)
 
+        corrected_data_monthly = DataPreprocessing.reshape_dataframe(corrected_data)
 
-        plt.figure(figsize=(12, 6))
-        sns.lineplot(x="Hour", y="M_consumption", data=corrected_data, hue="User", ci=None)
+        Plots.plot_norm_avg_cons(corrected_data_monthly)
 
-        # Adding labels and title
-        plt.xlabel("Hour")
-        plt.ylabel("Monthly Average Consumption")
-        plt.title("Hourly Consumption Profiles")
-
-        # Show the plot
-        plt.show()
-        # Adding labels and title
-        plt.xlabel("Hour")
-        plt.ylabel("Monthly Average Consumption")
-        plt.title("Hourly Consumption Profiles")
-
-        # Show the plot
-        plt.show()
-
-
-        return corrected_data
+        return corrected_data, corrected_data_monthly
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
