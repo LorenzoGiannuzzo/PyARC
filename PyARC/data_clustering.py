@@ -48,10 +48,13 @@ class Clustering:
 
         return optimal_num_clusters
 
-   # def k_means_clustering(data,optimal_cluster):
+    def k_means_clustering(data,n_optimal_cluster):
+        # Seleziona solo la colonna "M_consumption" per il clustering
+        X = data[['M_consumption']]
+        # Prova il clustering per un numero di cluster da 3 a 8
 
-    #    kmeans = KMeans(n_clusters=optimal_cluster, n_init=400, max_iter=600, algorithm='lloyd')
-     #   kmeans_labels = kmeans.fit_predict(X)
+        kmeans = KMeans(n_clusters=n_optimal_cluster, n_init=400, max_iter=600, algorithm='lloyd')
+        kmeans_labels = kmeans.fit_predict(X)
 
-
+        return kmeans_labels
 

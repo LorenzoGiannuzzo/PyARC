@@ -64,7 +64,9 @@ class PyARC:
 
         optimal_number_cluster = Clustering.find_optimal_cluster_number(corrected_data_monthly)
 
-        return corrected_data, corrected_data_monthly, optimal_number_cluster
+        k_label = Clustering.k_means_clustering(corrected_data,optimal_number_cluster)
+
+        return corrected_data, corrected_data_monthly, optimal_number_cluster, k_label
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
