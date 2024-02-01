@@ -19,5 +19,5 @@ class Plots:
        plots_dir = os.path.join(script_dir, "..", "plots")  # Navigate to the "plots" directory
        os.makedirs(plots_dir, exist_ok=True)  # Create the "plots" directory if it doesn't exist
 
-       plt.savefig(os.path.join(plots_dir, "plot_image.png"))
+       plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 

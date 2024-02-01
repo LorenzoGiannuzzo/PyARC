@@ -1,43 +1,57 @@
 import pandas as pd
-import numpy as np
+import os
 from sklearn.cluster import KMeans
-from sklearn.metrics import davies_bouldin_score
+from sklearn.metrics import davies_bouldin_score, silhouette_score
+from kneed import KneeLocator
+import numpy as np
+from scipy.stats import mode
+from sklearn.cluster import KMeans
+
 import matplotlib.pyplot as plt
 
+class Clustering:
 
-def kmeans_clustering(df):
-    # Creazione dei profili di carico giornalieri
-    daily_profiles = df.groupby(["User", "Year", "Month", "Day"]).agg(
-        {"Hour": list, "Norm_consumption": list}).reset_index()
+    def find_optimal_cluster_number(data):
+        # Seleziona solo la colonna "M_consumption" per il clustering
+        X = data[['M_consumption']]
 
-    # Inizializzazione dei valori per la ricerca del miglior numero di cluster
-    best_davies_bouldin = float('inf')
-    best_k = 0
+        # Lista per memorizzare i risultati dell'indice di Davies-Bouldin
+        dbi_scores = []
 
-    # Ricerca del numero ottimale di cluster (tra 3 e 7)
-    for k in range(3, 8):
+        # Prova il clustering per un numero di cluster da 3 a 8
+        for num_clusters in range(3, 9):
+            kmeans = KMeans(n_clusters=num_clusters, n_init=400, max_iter=600, algorithm='lloyd')
+            kmeans_labels = kmeans.fit_predict(X)
 
-            kmeans = KMeans(n_clusters=k, n_init=400, max_iter=700,algorithm='lloyd').fit(daily_profiles["Norm_consumption"].tolist())
-            davies_bouldin = davies_bouldin_score(daily_profiles["Norm_consumption"].tolist(), kmeans.labels_)
+            # Calcola e salva il valore dell'indice di Davies-Bouldin
+            dbi_score = davies_bouldin_score(X, kmeans_labels)
+            dbi_scores.append(dbi_score)
 
-            if davies_bouldin < best_davies_bouldin:
-                best_davies_bouldin = davies_bouldin
-                best_k = k
+        # Trova il numero ottimale di cluster utilizzando l'indice di Davies-Bouldin
+        optimal_num_clusters = np.argmin(
+            dbi_scores) + 3  # Argmin restituisce l'indice del minimo, aggiungiamo 3 per ottenere il numero di cluster
 
-    # Esecuzione del clustering con il miglior numero di cluster
-    kmeans = KMeans(n_clusters=best_k, n_init=1, max_iter=700,algorithm='lloyd').fit(daily_profiles["Norm_consumption"].tolist())
-    daily_profiles["Cluster"] = kmeans.labels_ +1
+        # Crea il plot per l'andamento del DBI index al variare del numero di cluster
+        plt.figure(figsize=(12, 6))
+        plt.plot(range(3, 9), dbi_scores, marker='o', linestyle='-', color='b')
+        plt.xlabel("Number of Clusters")
+        plt.ylabel("Davies-Bouldin Index")
+        plt.title("Davies-Bouldin Index vs Number of Clusters")
+        plt.grid(True)
 
-    cluster_centroids_df = kmeans.cluster_centers_
+        # Save the plot as a .png file in the "plots" directory
+        script_dir = os.path.dirname(__file__)  # Get the directory of the current script
+        plots_dir = os.path.join(script_dir, "..", "plots")  # Navigate to the "plots" directory
+        os.makedirs(plots_dir, exist_ok=True)  # Create the "plots" directory if it doesn't exist
 
-    df2 = pd.DataFrame(cluster_centroids_df)
-    df2["Cluster"] = df2.index + 1
-    df2_long = pd.melt(df2, id_vars=['Cluster'], var_name='Hour', value_name='Norm_consumption')
+        plt.savefig(os.path.join(plots_dir, "Davies-Bouldin Index vs Number of Clusters.png"))
 
-    # Ordinamento in base a "Cluster" e "Hour"
-    df2_long.sort_values(['Cluster', 'Hour'], inplace=True)
-    #df_long = pd.melt(df2, var_name="Hour", value_name="Norm_consumption")
+        return optimal_num_clusters
 
-    return df.merge(daily_profiles[["User", "Year", "Month", "Day", "Cluster"]],
-                    on=["User", "Year", "Month", "Day"]),df2_long
+   # def k_means_clustering(data,optimal_cluster):
+
+    #    kmeans = KMeans(n_clusters=optimal_cluster, n_init=400, max_iter=600, algorithm='lloyd')
+     #   kmeans_labels = kmeans.fit_predict(X)
+
+
 

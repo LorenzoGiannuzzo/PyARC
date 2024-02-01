@@ -10,8 +10,8 @@ from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
 from data_preprocessing import DataPreprocessing
 from data_normalization import DataNormalization
+from data_clustering import Clustering
 from plots import Plots
-from data_clustering import kmeans_clustering
 
 # Define PyARC class
 class PyARC:
@@ -62,7 +62,9 @@ class PyARC:
 
         Plots.plot_norm_avg_cons(corrected_data_monthly)
 
-        return corrected_data, corrected_data_monthly
+        optimal_number_cluster = Clustering.find_optimal_cluster_number(corrected_data_monthly)
+
+        return corrected_data, corrected_data_monthly, optimal_number_cluster
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
