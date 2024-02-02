@@ -5,6 +5,7 @@ from sklearn.metrics import davies_bouldin_score
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
@@ -64,9 +65,9 @@ class PyARC:
 
         optimal_number_cluster = Clustering.find_optimal_cluster_number(corrected_data_monthly)
 
-        k_label = Clustering.k_means_clustering(corrected_data,optimal_number_cluster)
+        #corrected_data_monthly = Clustering.kmeans_clustering(corrected_data_monthly,optimal_number_cluster)
 
-        return corrected_data, corrected_data_monthly, optimal_number_cluster, k_label
+        return corrected_data_monthly, optimal_number_cluster
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
