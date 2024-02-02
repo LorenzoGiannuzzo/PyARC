@@ -24,3 +24,42 @@ class Plots:
         os.makedirs(plots_dir, exist_ok=True)  # Create the "plots" directory if it doesn't exist
 
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
+
+    def plot_cluster_centroids(cluster_centers_long_df):
+        # Numero dinamico di colonne in FacetGrid
+        num_clusters = cluster_centers_long_df['Cluster'].nunique()
+
+        # Creazione di una palette di colori unica per ciascun cluster
+        palette = sns.color_palette("husl", n_colors=num_clusters)
+
+        # Inizializza un FacetGrid
+        g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", col_wrap=num_clusters, height=4)
+
+        # Disegna i profili dei centroidi per ogni cluster utilizzando colori diversi
+        for i, (_, data) in enumerate(cluster_centers_long_df.groupby('Cluster')):
+            sns.lineplot(data=data, x="Hour", y="Centroid", color=palette[i], ax=g.axes[i])
+
+        # Aggiungi etichette e titolo
+        g.set_axis_labels("Hour", "Centroid Value")
+        g.fig.suptitle("Cluster Centroids Profiles", y=1.1) # Aumentato il valore y per evitare il taglio del titolo
+
+        # Regola gli assi per una migliore visualizzazione
+        g.set(xticks=list(range(24)), xlim=(0, 23), ylim=(0, 1))
+
+        # Riduci ulteriormente il margine superiore per evitare il taglio del titolo
+        plt.subplots_adjust(top=0.9)
+
+        # Ottieni il percorso della directory del codice
+        script_dir = os.path.dirname(__file__)
+
+        # Crea la directory "plots" se non esiste
+        plots_dir = os.path.join(script_dir, "..", "plots")
+        os.makedirs(plots_dir, exist_ok=True)
+
+        # Salva il plot come immagine nella directory "plots"
+        plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"))
+
+
+
+
+

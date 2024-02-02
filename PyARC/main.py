@@ -13,6 +13,7 @@ from data_preprocessing import DataPreprocessing
 from data_normalization import DataNormalization
 from data_clustering import Clustering
 from plots import Plots
+from export_data import Export
 
 # Define PyARC class
 class PyARC:
@@ -47,7 +48,6 @@ class PyARC:
         corrected_data = DataPreprocessing.interpolate_missing_values(corrected_data, max_gap=3)
         corrected_data = DataPreprocessing.fill_missing_values_with_monthly_mean(corrected_data)
 
-
         data_normalizer = DataNormalization(corrected_data)
         corrected_data = data_normalizer.normalize_consumption()
 
@@ -63,11 +63,15 @@ class PyARC:
 
         Plots.plot_norm_avg_cons(corrected_data_monthly)
 
-        optimal_number_cluster = Clustering.find_optimal_cluster_number(corrected_data_monthly)
+        optimal_number_cluster, votes = Clustering.find_optimal_cluster_number(corrected_data_monthly)
 
-        #corrected_data_monthly = Clustering.kmeans_clustering(corrected_data_monthly,optimal_number_cluster)
+        corrected_data_monthly, centroids = Clustering.kmeans_clustering(corrected_data_monthly,optimal_number_cluster)
 
-        return corrected_data_monthly, optimal_number_cluster
+        Plots.plot_cluster_centroids(centroids)
+
+        Export.export_csv(centroids)
+
+        return corrected_data_monthly, centroids
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
