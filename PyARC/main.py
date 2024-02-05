@@ -71,6 +71,10 @@ class PyARC:
 
         corrected_data = GetFeatures.spot_tou(corrected_data,tou_dataframe)
 
+        corrected_data = GetFeatures.get_features(corrected_data)
+
+        corrected_data = GetFeatures.create_permutation_ratios(corrected_data)
+
         return corrected_data_monthly, corrected_data, centroids, tou_dataframe
 
 # Check if the script is being run as the main program
