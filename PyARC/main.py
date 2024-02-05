@@ -1,11 +1,6 @@
 # Import necessary modules
 import os
-from sklearn.cluster import KMeans
-from sklearn.metrics import davies_bouldin_score
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib
+
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
@@ -14,6 +9,7 @@ from data_normalization import DataNormalization
 from data_clustering import Clustering
 from plots import Plots
 from export_data import Export
+from get_features import GetFeatures
 
 # Define PyARC class
 class PyARC:
@@ -67,11 +63,15 @@ class PyARC:
 
         corrected_data_monthly, centroids = Clustering.kmeans_clustering(corrected_data_monthly,optimal_number_cluster)
 
+        corrected_data = DataPreprocessing.merge_clusters(corrected_data,corrected_data_monthly)
+
         Plots.plot_cluster_centroids(centroids)
 
         Export.export_csv(centroids)
 
-        return corrected_data_monthly, centroids
+        corrected_data = GetFeatures.spot_tou(corrected_data,tou_dataframe)
+
+        return corrected_data_monthly, corrected_data, centroids, tou_dataframe
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":

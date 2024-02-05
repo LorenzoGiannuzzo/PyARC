@@ -163,3 +163,10 @@ class DataPreprocessing:
             result_df = pd.concat([result_df, updated_day_df])
 
         return result_df
+
+    def merge_clusters(main_df, smaller_df):
+        merged_df = pd.merge(main_df, smaller_df[['User', 'Year', 'Month', 'Hour', 'Cluster']],
+                             on=['User', 'Year', 'Month', 'Hour'], how='left')
+        main_df['Cluster'] = merged_df['Cluster']
+
+        return main_df
