@@ -75,7 +75,9 @@ class PyARC:
 
         corrected_data = GetFeatures.create_permutation_ratios(corrected_data)
 
-        return corrected_data_monthly, corrected_data, centroids, tou_dataframe
+        features = GetFeatures.get_selected_features_and_cluster(corrected_data)
+
+        return corrected_data_monthly, corrected_data, centroids, tou_dataframe, features
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":

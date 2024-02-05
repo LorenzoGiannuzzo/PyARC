@@ -41,7 +41,7 @@ class GetFeatures:
 
         # Creazione di colonne come rapporto tra le colonne create e "Monthly_consumption"
         for tou_value in unique_tou_values:
-            ratio_col_name = f'{tou_value}_Monthly_Ratio'
+            ratio_col_name = f'{tou_value}_Ratio_Monthly'
             df[ratio_col_name] = df[f'{tou_value}'] / df['Monthly_consumption']
 
         return df
@@ -54,6 +54,9 @@ class GetFeatures:
         unique_to_u_values = df['ToU'].unique()
         extension_values = df.groupby('ToU')['Extension'].max().reset_index()
 
+        # Aggiungi la colonna "Monthly_consumption" come somma delle colonne create da X
+        df['Monthly_consumption'] = df[[f'{tou_value}' for tou_value in unique_to_u_values]].sum(axis=1)
+
         for perm in permutations(unique_to_u_values, 2):
             numerator, denominator = perm
             ratio_col_name = f'{numerator}_{denominator}_Ratio'
@@ -61,10 +64,37 @@ class GetFeatures:
             # Condizione di confronto delle estensioni
             if extension_values[extension_values['ToU'] == numerator]['Extension'].values[0] > \
                     extension_values[extension_values['ToU'] == denominator]['Extension'].values[0]:
-                # Calcola il rapporto tra le colonne
+                # Calcola il rapporto tra le colonne create da X
                 df[ratio_col_name] = df[f'{numerator}'] / df[f'{denominator}']
 
         return df
+
+    def get_selected_features_and_cluster(df):
+        # Lista delle colonne da selezionare
+        columns_to_select = ['Cluster']
+
+        # Aggiungi le colonne create dinamicamente
+        unique_to_u_values = df['ToU'].unique()
+        for tou_value in unique_to_u_values:
+            columns_to_select.append(tou_value)
+            columns_to_select.append(f'{tou_value}_Ratio_Monthly')
+
+        unique_to_u_values = df['ToU'].unique()
+        extension_values = df.groupby('ToU')['Extension'].max().reset_index()
+
+        for perm in permutations(unique_to_u_values, 2):
+            numerator, denominator = perm
+            ratio_col_name = f'{numerator}_{denominator}_Ratio'
+
+            # Condizione di confronto delle estensioni
+            if extension_values[extension_values['ToU'] == numerator]['Extension'].values[0] > \
+                    extension_values[extension_values['ToU'] == denominator]['Extension'].values[0]:
+                columns_to_select.append(ratio_col_name)
+
+         # Filtra il DataFrame per le colonne selezionate
+        selected_df = df[columns_to_select]
+
+        return selected_df
 
 
 
