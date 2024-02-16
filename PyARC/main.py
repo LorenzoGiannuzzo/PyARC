@@ -1,6 +1,5 @@
 # Import necessary modules
 import os
-
 from get_tou import CSVHandler as TouCSVHandler
 from get_file import CSVHandler as DataCSVHandler
 from data_preparation import DataFrameProcessor
@@ -10,6 +9,7 @@ from data_clustering import Clustering
 from plots import Plots
 from export_data import Export
 from get_features import GetFeatures
+from data_classification import RandomForest
 
 # Define PyARC class
 class PyARC:
@@ -77,7 +77,9 @@ class PyARC:
 
         features = GetFeatures.get_selected_features_and_cluster(corrected_data)
 
-        return corrected_data_monthly, corrected_data, centroids, tou_dataframe, features
+        model = RandomForest.model_training(features)
+
+        return features, model
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":

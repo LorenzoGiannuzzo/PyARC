@@ -94,6 +94,9 @@ class GetFeatures:
          # Filtra il DataFrame per le colonne selezionate
         selected_df = df[columns_to_select]
 
+        selected_df = selected_df.drop_duplicates()
+        selected_df = selected_df.replace([np.inf, -np.inf], np.nan).dropna()
+
         return selected_df
 
 
