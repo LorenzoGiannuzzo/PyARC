@@ -79,7 +79,7 @@ class PyARC:
 
         model = RandomForest.model_training(features)
 
-        return features, model
+        return model
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
