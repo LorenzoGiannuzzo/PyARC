@@ -122,28 +122,42 @@ class PyARC:
         # Keep only the columns recognized by the model
         features = data[feature_names_used]
 
+        features = features.loc[(features != 0).any(axis=1)]
+        features.replace([np.inf, -np.inf], 0, inplace=True)
+        features.fillna(0, inplace=True)
         features = features.drop_duplicates()
-        features = features.replace([np.inf, -np.inf], np.nan).dropna()
+
+        data = data.loc[(data != 0).any(axis=1)]
+        data.replace([np.inf, -np.inf], 0, inplace=True)
+        data.fillna(0, inplace=True)
 
         features["Cluster"] = model.predict(features)
 
-        return features
+        merge_columns = [col for col in features.columns if col != 'Cluster']
+
+        # Effettua la fusione basata sulle colonne chiave
+        merged_data = data.merge(features[['Cluster'] + merge_columns], how='left', on=merge_columns)
+
+        return merged_data
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
     # Define full paths to the files
+    #
+    # data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
+    # data_file_path = os.path.join(data_file_directory, "default_data.csv")
+    #
+    # tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
+    # tou_file_path = os.path.join(tou_file_directory, "default_tou.csv")
+    #
+    # # Create an instance of PyARC and call train_model
+    # pyarc_instance = PyARC()
+    # output = pyarc_instance.train_model(data_file_path, tou_file_path)
 
-    data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
-    data_file_path = os.path.join(data_file_directory, "default_data.csv")
 
-    tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
-    tou_file_path = os.path.join(tou_file_directory, "default_tou.csv")
 
-    # Create an instance of PyARC and call train_model
     pyarc_instance = PyARC()
-    output = pyarc_instance.train_model(data_file_path, tou_file_path)
-
-    #output2 = pyarc_instance.reconstruct_profiles()
+    data = pyarc_instance.reconstruct_profiles()
 
 
 
