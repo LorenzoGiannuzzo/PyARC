@@ -71,7 +71,7 @@ class GetFeatures:
 
     def get_selected_features_and_cluster(df):
         # Lista delle colonne da selezionare
-        columns_to_select = ['Cluster']
+        columns_to_select = ['Cluster', 'Monthly_consumption']
 
         # Aggiungi le colonne create dinamicamente
         unique_to_u_values = df['ToU'].unique()
@@ -91,7 +91,7 @@ class GetFeatures:
                     extension_values[extension_values['ToU'] == denominator]['Extension'].values[0]:
                 columns_to_select.append(ratio_col_name)
 
-         # Filtra il DataFrame per le colonne selezionate
+        # Filtra il DataFrame per le colonne selezionate
         selected_df = df[columns_to_select]
 
         selected_df = selected_df.drop_duplicates()
