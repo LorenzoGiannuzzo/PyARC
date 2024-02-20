@@ -90,6 +90,7 @@ class PyARC:
 
         data_path = os.path.join("..", "data", "Input Data", "data.csv")
         tou_path = os.path.join("..", "data", "Input Data", "tou.csv")
+        centroids_path = os.path.join("..","data","Centroids","centroid_data.csv")
 
         data_handler = DataCSVHandler(data_path)
         data_handler.load_csv()
@@ -99,6 +100,10 @@ class PyARC:
         tou_handler = TouCSVHandler(tou_path)
         tou_handler.load_csv()
         tou = tou_handler.get_data()
+
+        centroids_handler = DataCSVHandler(centroids_path)
+        centroids_handler.load_csv()
+        centroids = centroids_handler.get_data()
 
         # Data preprocessing steps
         data_processor = DataPreprocessing(data)
@@ -138,21 +143,23 @@ class PyARC:
         # Effettua la fusione basata sulle colonne chiave
         merged_data = data.merge(features[['Cluster'] + merge_columns], how='left', on=merge_columns)
 
+
+
         return merged_data
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
     # Define full paths to the files
+
+    data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
+    data_file_path = os.path.join(data_file_directory, "default_data.csv")
     #
-    # data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
-    # data_file_path = os.path.join(data_file_directory, "default_data.csv")
-    #
-    # tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
-    # tou_file_path = os.path.join(tou_file_directory, "default_tou.csv")
-    #
-    # # Create an instance of PyARC and call train_model
-    # pyarc_instance = PyARC()
-    # output = pyarc_instance.train_model(data_file_path, tou_file_path)
+    tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Default Training Data")
+    tou_file_path = os.path.join(tou_file_directory, "default_tou.csv")
+
+    # Create an instance of PyARC and call train_model
+    pyarc_instance = PyARC()
+    output = pyarc_instance.train_model(data_file_path, tou_file_path)
 
 
 

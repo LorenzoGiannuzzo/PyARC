@@ -5,38 +5,41 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from joblib import dump
 import matplotlib.pyplot as plt
-import  numpy as np
+import numpy as np
 import seaborn as sns
 
 class RandomForest:
 
+    def __init__(self):
+        self.model = None
 
 
-    @staticmethod
-    def model_training(df):
-        # Carica il tuo DataFrame
-        # Supponendo che il DataFrame si chiami "df"
-        # Se non hai già scikit-learn installato, puoi farlo con: pip install scikit-learn
+    def _load_dataframe(self, df):
+        self.df = df
 
+    def _convert_cluster_to_word(self):
         def convert_to_word(number):
-            # Funzione per convertire un numero in una parola
-            words = ["Zero", "One", "Two", "Three", "Four", "Five","Six","Seven","Eight","Nine"]  # Aggiungi le parole mancanti secondo necessità
+            # Function to convert a number to a word
+            words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]  # Add missing words as needed
             return words[number]
 
-        # Sostituisci gli elementi nella colonna "Cluster" con le parole corrispondenti
-        df['Cluster'] = df['Cluster'].apply(convert_to_word)
+        # Replace elements in the "Cluster" column with corresponding words
+        self.df['Cluster'] = self.df['Cluster'].apply(convert_to_word)
 
-        # Estrai la colonna "Cluster" come target e le rimanenti colonne come features
-        X = df.drop("Cluster", axis=1)
-        y = df["Cluster"]
+    def _extract_features_target(self):
+        # Extract features and target from the DataFrame
+        self.X = self.df.drop("Cluster", axis=1)
+        self.y = self.df["Cluster"]
 
-        # Suddividi il dataset in set di addestramento e test
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    def _split_dataset(self):
+        # Split the dataset into training and test sets
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.3, random_state=42)
 
-        # Crea un modello di Random Forest
+    def _train_model(self):
+        # Create a Random Forest model
         rf_model = RandomForestClassifier(criterion='gini', max_depth=None, random_state=42)
 
-        # Definisci la griglia degli iperparametri da esplorare
+        # Define the hyperparameter grid to explore
         param_grid = {
             'n_estimators': [50, 500],
             'min_samples_split': [2, 5, 10],
@@ -44,67 +47,93 @@ class RandomForest:
             'max_features': [1, 2, 3, 4, 5]
         }
 
-        # Crea un oggetto GridSearchCV per la ricerca degli iperparametri
+        # Create a GridSearchCV object for hyperparameter tuning
         grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, cv=5, scoring='accuracy')
 
-        # Esegui la ricerca degli iperparametri sul set di addestramento
-        grid_search.fit(X_train, y_train)
+        # Perform hyperparameter tuning on the training set
+        grid_search.fit(self.X_train, self.y_train)
 
-        # Visualizza i migliori parametri trovati
+        # Get the model with the best parameters
+        self.model = grid_search.best_estimator_
 
-        best_params = grid_search.best_params_
-        print("Migliori parametri:", best_params)
+    def _evaluate_model(self):
+        # Make predictions on the test set
+        y_pred = self.model.predict(self.X_test)
 
-        # Ottieni il modello con i migliori parametri
-        best_rf_model = grid_search.best_estimator_
+        # Calculate and print accuracy on the test set
+        accuracy_test = accuracy_score(self.y_test, y_pred)
 
-        # Fai previsioni sul set di test
-        y_pred = best_rf_model.predict(X_test)
+        # Calculate and print accuracy on the training set
+        accuracy_train = self.model.score(self.X_train, self.y_train)
+        print("Accuracy on training set:", accuracy_train)
+        print("Accuracy on test set:", accuracy_test)
 
-        # Calcola e stampa l'accuracy sul set di test
-        accuracy_test = accuracy_score(y_test, y_pred)
-
-        # Calcola e stampa l'accuracy sul set di addestramento
-        accuracy_train = best_rf_model.score(X_train, y_train)
-        print("Accuracy sul set di addestramento:", accuracy_train)
-        print("Accuracy sul set di test:", accuracy_test)
-
+    def _save_model(self):
         model_folder = "Pre-trained Model"
-        # Percorso completo per il file del modello
+        # Full path for the model file
         model_filename = os.path.join("..", model_folder, "random_forest_model.joblib")
 
-        # Salvare il modello
-        dump(best_rf_model, model_filename)
-        # Se stai utilizzando scikit-learn >= 0.24.0, sostituisci la riga sopra con:
-        # dump(best_rf_model, model_filename)
+        # Save the model
+        dump(self.model, model_filename)
+        # If you're using scikit-learn >= 0.24.0, replace the line above with:
+        # dump(self.model, model_filename)
 
-        print(f"Modello salvato in {model_filename}")
+        print(f"Model saved to {model_filename}")
 
+    def _plot_feature_importance(self):
         def plot_feature_importance(importance, names, model_type):
-            # Crea un DataFrame con le variabili e le relative importanze
+            # Create a DataFrame with variables and their importance
             feature_importance = np.array(importance)
             feature_names = np.array(names)
 
             data = {'feature_names': feature_names, 'feature_importance': feature_importance}
             fi_df = pd.DataFrame(data)
 
-            # Ordina il DataFrame in base all'importanza delle feature
+            # Sort the DataFrame by feature importance
             fi_df.sort_values(by=['feature_importance'], ascending=False, inplace=True)
 
-            # Crea un grafico a barre
+            # Create a bar plot
             plt.figure(figsize=(10, 8))
             sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'])
-            # Aggiungi etichette e titolo
+            # Add labels and title
             plt.title(model_type + ' - Feature Importance')
             plt.xlabel('Feature Importance')
             plt.ylabel('Feature Names')
 
-            # Salva il grafico su un file
-            plot_filename = os.path.join("..", "plots" , "feature_importance_plot.png")
+            # Save the plot to a file
+            plot_filename = os.path.join("..", "plots", "feature_importance_plot.png")
             plt.savefig(plot_filename)
 
-        # Chiamata alla funzione prima del return del modello
-        feature_names = X.columns
-        plot_feature_importance(best_rf_model.feature_importances_, feature_names, 'Random Forest')
+        # Call the function before returning the model
+        feature_names = self.X.columns
+        plot_feature_importance(self.model.feature_importances_, feature_names, 'Random Forest')
 
-        return best_rf_model
+
+        # Call the function before returning the model
+        feature_names = self.X.columns
+        plot_feature_importance(self.model.feature_importances_, feature_names, 'Random Forest')
+
+    @staticmethod
+    def model_training(df):
+        random_forest_instance = RandomForest()
+
+        # Load your DataFrame
+        # Assuming the DataFrame is named "df"
+        # If you don't have scikit-learn installed, you can do so with: pip install scikit-learn
+        random_forest_instance._load_dataframe(df)
+
+        random_forest_instance._convert_cluster_to_word()
+
+        random_forest_instance._extract_features_target()
+
+        random_forest_instance._split_dataset()
+
+        random_forest_instance._train_model()
+
+        random_forest_instance._evaluate_model()
+
+        random_forest_instance._save_model()
+
+        random_forest_instance._plot_feature_importance()
+
+        return random_forest_instance.model
