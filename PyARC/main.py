@@ -107,13 +107,13 @@ class PyARC:
         centroids = centroids_handler.get_data()
 
         # Extract features, create permutation ratios, and select features
-        data = GetFeatures.get_features(data)
-        data = GetFeatures.create_permutation_ratios(data)
+
+        data = GetFeatures.get_features2(data)
 
         # Get feature names used by the model
         feature_names_used = model.feature_names_in_
-
         # Keep only the columns recognized by the model
+
         features = data[feature_names_used]
 
         features = features.loc[(features != 0).any(axis=1)]
@@ -132,7 +132,12 @@ class PyARC:
         # Effettua la fusione basata sulle colonne chiave
         merged_data = data.merge(features[['Cluster'] + merge_columns], how='left', on=merge_columns)
 
-        return merged_data
+        centroids = GetFeatures.spot_tou(centroids, tou)
+        centroids = GetFeatures.identify_main_ToU(centroids)
+        centroids = GetFeatures.calculate_sum_column(centroids)
+        centroids = GetFeatures.calculate_weight_coefficient(centroids)
+
+        return merged_data, centroids
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
@@ -146,10 +151,10 @@ if __name__ == "__main__":
 
     # Create an instance of PyARC and call train_model
     pyarc_instance = PyARC()
-    output = pyarc_instance.train_model(data_file_path, tou_file_path)
+    #output = pyarc_instance.train_model(data_file_path, tou_file_path)
 
     pyarc_instance = PyARC()
-    #data = pyarc_instance.reconstruct_profiles()
+    data = pyarc_instance.reconstruct_profiles()
 
 
 

@@ -99,6 +99,81 @@ class GetFeatures:
 
         return selected_df
 
+    def get_features2(df):
+        # Select only numeric columns (excluding "User", "Year", "Month")
+        numeric_columns = df.select_dtypes(include=['number']).columns.difference(["User", "Year", "Month"])
+
+        # Aggiungi la colonna "Monthly_consumption" come somma delle colonne numeriche
+        df['Monthly_consumption'] = df[numeric_columns].sum(axis=1)
+
+        # Create all possible combinations of numeric columns, including "Monthly_consumption"
+        all_columns = numeric_columns.union(['Monthly_consumption'])
+        column_combinations = pd.DataFrame()
+
+        # Calculate the ratio for each pair of columns
+        for col1 in all_columns:
+            for col2 in all_columns:
+                if col1 != col2:
+                    # Define the name of the ratio column
+                    ratio_column_name = '{}_{}_Ratio'.format(col1, col2)
+
+                    # Adjust the name if "Monthly_consumption" is involved
+                    if "Monthly_consumption" in [col1, col2]:
+                        ratio_column_name = '{}_Ratio_Monthly'.format(
+                            col1) if col2 == "Monthly_consumption" else '{}_Ratio_Monthly'.format(col2)
+
+                    # Calculate the ratio and add it to the new dataframe
+                    column_combinations[ratio_column_name] = df[col1] / df[col2]
+
+        # Concatenate the original dataframe with the new columns
+        new_dataframe = pd.concat([df, column_combinations], axis=1)
+
+        return new_dataframe
+
+    def identify_main_ToU(df):
+        # Select only rows with "Hour" in the range from 8 to 20
+        df_interval = df[(df['Hour'] >= 10) & (df['Hour'] <= 18)]
+
+        # Count occurrences of each "ToU" in the selected interval
+        ToU_counts = df_interval['ToU'].value_counts()
+
+        # Find the most frequent "ToU" and its count
+        main_ToU = ToU_counts.idxmax()
+        main_ToU_frequency = ToU_counts.max()
+
+        # Calculate the total duration of the interval for the main "ToU"
+        duration_main_ToU = df_interval[df_interval['ToU'] == main_ToU].shape[0]
+
+        # Calculate the extension per unique cluster
+        unique_clusters = df_interval['Cluster'].nunique()
+        extension_per_cluster = duration_main_ToU / unique_clusters
+
+        # Create new columns "main ToU" and "Extension" per unique cluster
+        df['main ToU'] = main_ToU
+        df['Extension'] = extension_per_cluster
+
+        return df
+
+    def calculate_sum_column(df):
+
+        # Filtra il dataframe per il "ToU" più frequente
+        df_main_ToU = df[df['ToU'] == df['main ToU']]
+
+        # Calcola la somma degli elementi della colonna "Centroid" per ogni elemento unico della colonna "Cluster"
+        sum_per_cluster = df_main_ToU.groupby('Cluster')['Centroid'].sum()
+
+        # Unisci la somma per ogni cluster nel dataframe originale
+        df = pd.merge(df, sum_per_cluster.reset_index(name='sum'), on='Cluster', how='left')
+
+        return df
+
+    def calculate_weight_coefficient(df):
+        # Calculate the "weight" column as "Centroid" / (Extension * sum)
+        df['weight'] = df['Centroid'] / (df['Extension'] * df['sum'])
+
+        return df
+
+
 
 
 
