@@ -173,6 +173,25 @@ class GetFeatures:
 
         return df
 
+    def numeric_to_words(df):
+        # Mappa numeri a parole
+        word_mapping = {
+            1: 'One',
+            2: 'Two',
+            3: 'Three',
+            4: 'Four',
+            5: 'Five',
+            6: 'Six',
+            7: 'Seven',
+            8: 'Eight',
+            9: 'Nine'
+        }
+
+        # Applica la mappatura alla colonna specificata
+        df['Cluster'] = df['Cluster'].map(word_mapping)
+
+        return df
+
 
 
 

@@ -1,5 +1,6 @@
 # Import necessary modules
 import os
+import pandas as pd
 import numpy as np
 import joblib
 from get_tou import CSVHandler as TouCSVHandler
@@ -12,6 +13,7 @@ from plots import Plots
 from export_data import Export
 from get_features import GetFeatures
 from data_classification import RandomForest
+from data_aggregation import Aggregator
 
 # Define PyARC class
 class PyARC:
@@ -136,8 +138,14 @@ class PyARC:
         centroids = GetFeatures.identify_main_ToU(centroids)
         centroids = GetFeatures.calculate_sum_column(centroids)
         centroids = GetFeatures.calculate_weight_coefficient(centroids)
+        centroids = GetFeatures.numeric_to_words(centroids)
 
-        return merged_data, centroids
+        output = Aggregator.expand_dataframe(merged_data)
+        output = pd.merge(output, centroids, on='Cluster', how='inner')
+        output = Aggregator.load_profile_generator(output)
+        output = Aggregator.aggregate_load(output)
+
+        return output
 
 # Check if the script is being run as the main program
 if __name__ == "__main__":
