@@ -74,6 +74,7 @@ class PyARC:
         # Extract features, create permutation ratios, and select features
         data = GetFeatures.get_features(data)
         data = GetFeatures.create_permutation_ratios(data)
+
         features = GetFeatures.get_selected_features_and_cluster(data)
 
         # Train a Random Forest model using selected features
@@ -105,18 +106,6 @@ class PyARC:
         centroids_handler.load_csv()
         centroids = centroids_handler.get_data()
 
-        # Data preprocessing steps
-        data_processor = DataPreprocessing(data)
-        data = data_processor.get_negative_values()
-        data = DataPreprocessing.replace_max_daily_zero_consumption(data)
-        data = DataPreprocessing.interpolate_missing_values(data, max_gap=3)
-        data = DataPreprocessing.fill_missing_values_with_monthly_mean(data)
-        data = DataPreprocessing.remove_outliers_iqr(data)
-        data = DataPreprocessing.interpolate_missing_values(data, max_gap=3)
-        data = DataPreprocessing.fill_missing_values_with_monthly_mean(data)
-
-        data = GetFeatures.spot_tou(data, tou)
-
         # Extract features, create permutation ratios, and select features
         data = GetFeatures.get_features(data)
         data = GetFeatures.create_permutation_ratios(data)
@@ -143,8 +132,6 @@ class PyARC:
         # Effettua la fusione basata sulle colonne chiave
         merged_data = data.merge(features[['Cluster'] + merge_columns], how='left', on=merge_columns)
 
-
-
         return merged_data
 
 # Check if the script is being run as the main program
@@ -161,10 +148,8 @@ if __name__ == "__main__":
     pyarc_instance = PyARC()
     output = pyarc_instance.train_model(data_file_path, tou_file_path)
 
-
-
     pyarc_instance = PyARC()
-    data = pyarc_instance.reconstruct_profiles()
+    #data = pyarc_instance.reconstruct_profiles()
 
 
 
