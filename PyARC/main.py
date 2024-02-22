@@ -6,22 +6,22 @@ class ModelManager:
         self.pyarc_instance = PyARC()
 
     def use_pretrained_model(self):
-        data = self.pyarc_instance.reconstruct_profiles()
+        self.pyarc_instance.reconstruct_profiles()
         # Aggiungi eventuali logiche aggiuntive specifiche per l'utilizzo del modello pre-allenato
 
     def train_new_model(self):
         data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Input Training Data")
         data_file_path = os.path.join(data_file_directory, "train_data.csv")
 
-        tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Input Train Data")
+        tou_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Input Training Data")
         tou_file_path = os.path.join(tou_file_directory, "train_tou.csv")
 
-        output = self.pyarc_instance.train_model(data_file_path, tou_file_path)
+        self.pyarc_instance.train_model(data_file_path, tou_file_path)
         # Aggiungi eventuali logiche aggiuntive specifiche per l'addestramento di un nuovo modello
 
     def use_user_trained_model(self):
-        # Segnaposto per l'utilizzo di un modello addestrato dall'utente
-        pass
+
+        self.pyarc_instance.user_trained_model()
 
 def start_program():
     print("Welcome to PyARC! What would you like to do?")

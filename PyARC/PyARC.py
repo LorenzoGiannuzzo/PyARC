@@ -153,7 +153,7 @@ class PyARC:
 
         return output
 
-    def use_user_trained_model(self):
+    def user_trained_model(self):
         model_path = os.path.join("..", "User-trained Model", "random_forest_model.joblib")
 
         # Load the saved model
