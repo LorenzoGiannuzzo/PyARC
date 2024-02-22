@@ -59,6 +59,42 @@ class Plots:
         # Salva il plot come immagine nella directory "plots"
         plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"))
 
+    def plot_aggregate_loads(dataframe):
+        # Assuming 'dataframe' is your pandas DataFrame
+        matplotlib.use('agg')
+
+        plt.figure(figsize=(12, 8))
+
+        # Iterate over unique months in the DataFrame
+        for month in dataframe['Month'].unique():
+            plt.subplot(3, 4, month)  # Adjust the subplot grid as needed
+
+            # Filter data for the current month
+            month_data = dataframe[dataframe['Month'] == month]
+
+            # Create a box plot for the current month
+            sns.boxplot(x='Hour', y='Aggregate load', data=month_data)
+
+            # Add a line plot for each day in the month without dashes
+            sns.lineplot(x='Hour', y='Aggregate load', hue='Day', data=month_data, legend=False, style=None)
+
+            plt.title(f'Month: {month}')
+            plt.xlabel('Hour')
+
+            # Set x-axis tick labels fontsize manually
+            plt.xticks(fontsize=8)
+
+            plt.ylabel('Aggregate load [kWh]')
+
+            plt.tight_layout()
+
+        script_dir = os.path.dirname(__file__)
+        plots_dir = os.path.join(script_dir, "..", "plots")
+        os.makedirs(plots_dir, exist_ok=True)
+        plt.savefig(os.path.join(plots_dir, "Aggregate load profiles.png"))
+
+
+
 
 
 
