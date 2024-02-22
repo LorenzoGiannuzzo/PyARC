@@ -152,3 +152,69 @@ class PyARC:
         Export.export_output_csv(output)
 
         return output
+
+    def use_user_trained_model(self):
+        model_path = os.path.join("..", "User-trained Model", "random_forest_model.joblib")
+
+        # Load the saved model
+        model = joblib.load(model_path)
+
+        data_path = os.path.join("..", "data", "Input Data", "data.csv")
+        tou_path = os.path.join("..", "data", "Input Data", "tou.csv")
+        centroids_path = os.path.join("..", "data", "Centroids", "centroid_data.csv")
+
+        data_handler = DataCSVHandler(data_path)
+        data_handler.load_csv()
+        data = data_handler.get_data()
+
+        # Load TOU (Time of Use) CSV
+        tou_handler = TouCSVHandler(tou_path)
+        tou_handler.load_csv()
+        tou = tou_handler.get_data()
+
+        centroids_handler = DataCSVHandler(centroids_path)
+        centroids_handler.load_csv()
+        centroids = centroids_handler.get_data()
+
+        # Extract features, create permutation ratios, and select features
+
+        data = GetFeatures.get_features2(data)
+
+        # Get feature names used by the model
+        feature_names_used = model.feature_names_in_
+        # Keep only the columns recognized by the model
+
+        features = data[feature_names_used]
+
+        features = features.loc[(features != 0).any(axis=1)]
+        features.replace([np.inf, -np.inf], 0, inplace=True)
+        features.fillna(0, inplace=True)
+        features = features.drop_duplicates()
+
+        data = data.loc[(data != 0).any(axis=1)]
+        data.replace([np.inf, -np.inf], 0, inplace=True)
+        data.fillna(0, inplace=True)
+
+        features["Cluster"] = model.predict(features)
+
+        merge_columns = [col for col in features.columns if col != 'Cluster']
+
+        # Effettua la fusione basata sulle colonne chiave
+        merged_data = data.merge(features[['Cluster'] + merge_columns], how='left', on=merge_columns)
+
+        centroids = GetFeatures.spot_tou(centroids, tou)
+        centroids = GetFeatures.identify_main_ToU(centroids)
+        centroids = GetFeatures.calculate_sum_column(centroids)
+        centroids = GetFeatures.calculate_weight_coefficient(centroids)
+        centroids = GetFeatures.numeric_to_words(centroids)
+
+        output = Aggregator.expand_dataframe(merged_data)
+        output = pd.merge(output, centroids, on='Cluster', how='inner')
+        output = Aggregator.load_profile_generator(output)
+        output = Aggregator.aggregate_load(output)
+
+        Plots.plot_aggregate_loads(output)
+
+        Export.export_output_csv(output)
+
+        return output

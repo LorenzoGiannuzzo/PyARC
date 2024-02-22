@@ -69,7 +69,7 @@ class RandomForest:
         print("Accuracy on test set:", accuracy_test)
 
     def _save_model(self):
-        model_folder = "Pre-trained Model"
+        model_folder = "User-trained Model"
         # Full path for the model file
         model_filename = os.path.join("..", model_folder, "random_forest_model.joblib")
 
