@@ -1,13 +1,9 @@
-
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.metrics import davies_bouldin_score
+# Import necessary libraries
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
-from sklearn.preprocessing import StandardScaler
-from itertools import product
+
 
 
 class DataPreprocessing:
@@ -104,7 +100,7 @@ class DataPreprocessing:
 
     @staticmethod
     def reshape_dataframe(input_df):
-        # Raggruppa il dataframe per le colonne 'User', 'Year', 'Month'
+
         grouped_df = input_df.groupby(['User', 'Year', 'Month','Hour'])['M_consumption'].mean().reset_index()
 
         return grouped_df
@@ -112,43 +108,34 @@ class DataPreprocessing:
 
     @staticmethod
     def infrequent_profiles(df):
-        # Inizializza il dataframe risultante
+
         result_df = pd.DataFrame()
 
-        # Itera per ogni giorno della settimana (Dayname)
-        for dayname in df['Dayname'].unique():
-            # Filtra il dataframe per il giorno della settimana corrente
-            day_df = df[df['Dayname'] == dayname]
 
-            # Raggruppa per "Year", "Month", "Day" e ottieni i profili di carico giornalieri
+        for dayname in df['Dayname'].unique():
+
+            day_df = df[df['Dayname'] == dayname]
             daily_profiles = day_df.groupby(["Year", "Month", "Day"])["Norm_consumption"].apply(list).reset_index()
 
-            # Inizializza variabili per l'ottimizzazione del numero di cluster
             best_num_clusters = None
             best_dbi_score = float('inf')
 
-            # Prova il clustering con un numero di cluster variabile da 7 a 20
             for num_clusters in range(7, 21):
                 kmeans = KMeans(n_clusters=num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
                 clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
 
-                # Calcola il Davies-Bouldin Index
                 dbi_score = davies_bouldin_score(list(daily_profiles["Norm_consumption"]), clusters)
 
-                # Aggiorna il miglior numero di cluster se necessario
                 if dbi_score < best_dbi_score:
                     best_dbi_score = dbi_score
                     best_num_clusters = num_clusters
 
-            # Esegui nuovamente il clustering con il numero ottimale di cluster
             kmeans = KMeans(n_clusters=best_num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
             clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
 
-            # Calcola il massimo numero di utenti e profili di carico giornalieri
             max_users = df["User"].nunique()
             max_profiles = len(df["Norm_consumption"])
 
-            # Identifica i cluster poco popolati
             low_populated_clusters = []
             for cluster_id in range(best_num_clusters):
                 cluster_users = day_df[clusters == cluster_id]["User"].nunique()
@@ -156,10 +143,8 @@ class DataPreprocessing:
                 if cluster_users < 0.05 * max_users or cluster_profiles < 0.05 * max_profiles:
                     low_populated_clusters.append(cluster_id)
 
-            # Escludi i profili di carico giornalieri associati ai cluster poco popolati
             updated_day_df = day_df[~clusters.isin(low_populated_clusters)]
 
-            # Aggiorna il dataframe risultante
             result_df = pd.concat([result_df, updated_day_df])
 
         return result_df

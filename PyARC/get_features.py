@@ -2,31 +2,33 @@ import pandas as pd
 import numpy as np
 from itertools import permutations
 
+
 class GetFeatures:
 
     @staticmethod
     def spot_tou(main_df, tou_df):
-        # Merge
+        # Merge main_df with tou_df on 'Hour' column
         merged_df = pd.merge(main_df, tou_df[['Hour', 'ToU']], on='Hour', how='left')
         main_df['ToU'] = merged_df['ToU']
 
-        # Count degli elementi unici nella colonna "ToU"
+        # Count unique elements in the "ToU" column
         tou_counts = tou_df['ToU'].value_counts().reset_index()
         tou_counts.columns = ['ToU', 'Count']
 
-        # Ordina in base al conteggio in modo crescente
+        # Sort by count in ascending order
         tou_counts = tou_counts.sort_values(by='Count')
 
-        # Assegna i ranghi alla colonna "Extension" in base al conteggio
+        # Assign ranks to the "Extension" column based on the count
         tou_counts['Extension'] = range(1, len(tou_counts) + 1)
 
-        # Aggiungi la colonna "Extension" al dataframe principale
+        # Add the "Extension" column to the main dataframe
         main_df = pd.merge(main_df, tou_counts[['ToU', 'Extension']], on='ToU', how='left')
 
         return main_df
 
     @staticmethod
     def get_features(df):
+        # Get unique ToU values in the dataframe
         unique_tou_values = df['ToU'].unique()
 
         for tou_value in unique_tou_values:
@@ -36,44 +38,42 @@ class GetFeatures:
             tou_sum_df.rename(columns={'Consumption': tou_sum_column_name}, inplace=True)
             df = pd.merge(df, tou_sum_df, on=['User', 'Year', 'Month'], how='left')
 
-        # Creazione della colonna "Monthly_consumption" come somma delle colonne create dalla funzione
+        # Create the "Monthly_consumption" column as the sum of the dynamically created columns
         df['Monthly_consumption'] = df[[f'{tou_value}' for tou_value in unique_tou_values]].sum(axis=1)
 
-        # Creazione di colonne come rapporto tra le colonne create e "Monthly_consumption"
+        # Create columns as ratios between the created columns and "Monthly_consumption"
         for tou_value in unique_tou_values:
             ratio_col_name = f'{tou_value}_Ratio_Monthly'
             df[ratio_col_name] = df[f'{tou_value}'] / df['Monthly_consumption']
 
         return df
 
-    import pandas as pd
-    from itertools import permutations
-
     @staticmethod
     def create_permutation_ratios(df):
         unique_to_u_values = df['ToU'].unique()
         extension_values = df.groupby('ToU')['Extension'].max().reset_index()
 
-        # Aggiungi la colonna "Monthly_consumption" come somma delle colonne create da X
+        # Add the "Monthly_consumption" column as the sum of the columns created by X
         df['Monthly_consumption'] = df[[f'{tou_value}' for tou_value in unique_to_u_values]].sum(axis=1)
 
         for perm in permutations(unique_to_u_values, 2):
             numerator, denominator = perm
             ratio_col_name = f'{numerator}_{denominator}_Ratio'
 
-            # Condizione di confronto delle estensioni
+            # Condition for comparing extensions
             if extension_values[extension_values['ToU'] == numerator]['Extension'].values[0] > \
                     extension_values[extension_values['ToU'] == denominator]['Extension'].values[0]:
-                # Calcola il rapporto tra le colonne create da X
+                # Calculate the ratio between the columns created by X
                 df[ratio_col_name] = df[f'{numerator}'] / df[f'{denominator}']
 
         return df
 
+    @staticmethod
     def get_selected_features_and_cluster(df):
-        # Lista delle colonne da selezionare
+        # List of columns to select
         columns_to_select = ['Cluster', 'Monthly_consumption']
 
-        # Aggiungi le colonne create dinamicamente
+        # Add dynamically created columns
         unique_to_u_values = df['ToU'].unique()
         for tou_value in unique_to_u_values:
             columns_to_select.append(tou_value)
@@ -86,12 +86,12 @@ class GetFeatures:
             numerator, denominator = perm
             ratio_col_name = f'{numerator}_{denominator}_Ratio'
 
-            # Condizione di confronto delle estensioni
+            # Condition for comparing extensions
             if extension_values[extension_values['ToU'] == numerator]['Extension'].values[0] > \
                     extension_values[extension_values['ToU'] == denominator]['Extension'].values[0]:
                 columns_to_select.append(ratio_col_name)
 
-        # Filtra il DataFrame per le colonne selezionate
+        # Filter the DataFrame for selected columns
         selected_df = df[columns_to_select]
 
         selected_df = selected_df.drop_duplicates()
@@ -99,11 +99,12 @@ class GetFeatures:
 
         return selected_df
 
+    @staticmethod
     def get_features2(df):
         # Select only numeric columns (excluding "User", "Year", "Month")
         numeric_columns = df.select_dtypes(include=['number']).columns.difference(["User", "Year", "Month"])
 
-        # Aggiungi la colonna "Monthly_consumption" come somma delle colonne numeriche
+        # Add the "Monthly_consumption" column as the sum of numeric columns
         df['Monthly_consumption'] = df[numeric_columns].sum(axis=1)
 
         # Create all possible combinations of numeric columns, including "Monthly_consumption"
@@ -130,6 +131,7 @@ class GetFeatures:
 
         return new_dataframe
 
+    @staticmethod
     def identify_main_ToU(df):
         # Select only rows with "Hour" in the range from 8 to 20
         df_interval = df[(df['Hour'] >= 10) & (df['Hour'] <= 18)]
@@ -155,14 +157,13 @@ class GetFeatures:
         return df
 
     def calculate_sum_column(df):
-
-        # Filtra il dataframe per il "ToU" più frequente
+        # Filter the dataframe for the most frequent "ToU"
         df_main_ToU = df[df['ToU'] == df['main ToU']]
 
-        # Calcola la somma degli elementi della colonna "Centroid" per ogni elemento unico della colonna "Cluster"
+        # Calculate the sum of elements in the "Centroid" column for each unique value in the "Cluster" column
         sum_per_cluster = df_main_ToU.groupby('Cluster')['Centroid'].sum()
 
-        # Unisci la somma per ogni cluster nel dataframe originale
+        # Merge the sum for each cluster into the original dataframe
         df = pd.merge(df, sum_per_cluster.reset_index(name='sum'), on='Cluster', how='left')
 
         return df
@@ -174,7 +175,7 @@ class GetFeatures:
         return df
 
     def numeric_to_words(df):
-        # Mappa numeri a parole
+        # Map numbers to words
         word_mapping = {
             1: 'One',
             2: 'Two',
@@ -187,11 +188,10 @@ class GetFeatures:
             9: 'Nine'
         }
 
-        # Applica la mappatura alla colonna specificata
+        # Apply the mapping to the specified column
         df['Cluster'] = df['Cluster'].map(word_mapping)
 
         return df
-
 
 
 

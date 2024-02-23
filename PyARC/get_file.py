@@ -1,5 +1,4 @@
 # Import necessary modules
-import os
 import pandas as pd
 
 # Define CSVHandler class

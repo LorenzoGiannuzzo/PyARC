@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 class Plots:
+    @staticmethod
     def plot_norm_avg_cons(data):
         # Utilizza il backend "agg" per evitare la visualizzazione interattiva
         matplotlib.use('agg')
@@ -25,6 +26,7 @@ class Plots:
 
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 
+    @staticmethod
     def plot_cluster_centroids(cluster_centers_long_df):
         # Numero dinamico di colonne in FacetGrid
         num_clusters = cluster_centers_long_df['Cluster'].nunique()
@@ -59,6 +61,7 @@ class Plots:
         # Salva il plot come immagine nella directory "plots"
         plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"))
 
+    @staticmethod
     def plot_aggregate_loads(dataframe):
         # Assuming 'dataframe' is your pandas DataFrame
         matplotlib.use('agg')

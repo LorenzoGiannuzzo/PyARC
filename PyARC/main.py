@@ -2,9 +2,8 @@
 import os
 from PyARC import PyARC
 
+
 # Class to manage PyARC models
-
-
 class ModelManager:
 
     def __init__(self):
