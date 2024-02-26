@@ -85,7 +85,7 @@ class Plots:
             plt.xlabel('Hour')
 
             # Set x-axis tick labels fontsize manually
-            plt.xticks(fontsize=8)
+            plt.xticks(fontsize=5)
 
             plt.ylabel('Aggregate load [kWh]')
 
