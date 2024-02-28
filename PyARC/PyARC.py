@@ -1,4 +1,3 @@
-import os
 # Import necessary libraries
 import os
 import pandas as pd
@@ -90,7 +89,7 @@ class PyARC:
         self.model = RandomForest.model_training(features)
 
         # Return the trained model
-        return self.model
+        return self.model,data
 
     def reconstruct_profiles(self):
         model_path = os.path.join("..", "Pre-trained Model", "random_forest_model.joblib")

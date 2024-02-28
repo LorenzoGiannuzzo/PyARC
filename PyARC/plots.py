@@ -64,8 +64,6 @@ class Plots:
     @staticmethod
     def plot_aggregate_loads(dataframe):
         # Assuming 'dataframe' is your pandas DataFrame
-        matplotlib.use('agg')
-
         plt.figure(figsize=(12, 8))
 
         # Iterate over unique months in the DataFrame
@@ -76,26 +74,28 @@ class Plots:
             month_data = dataframe[dataframe['Month'] == month]
 
             # Create a box plot for the current month
-            sns.boxplot(x='Hour', y='Aggregate load', data=month_data)
 
-            # Add a line plot for each day in the month without dashes
-            sns.lineplot(x='Hour', y='Aggregate load', hue='Day', data=month_data, legend=False, style=None)
+            # Add a line plot for each day in the month with a more prominent color
+            sns.lineplot(x='Hour', y='Aggregate load', data=month_data, legend=None
+                         , dashes=False, linewidth=1.5)
 
-            plt.title(f'Month: {month}')
-            plt.xlabel('Hour')
+            plt.title(f'Month: {month}', fontsize=14)
+            plt.xlabel('Hour', fontsize=12)
 
-            # Set x-axis tick labels fontsize manually
-            plt.xticks(fontsize=5)
+            # Set x-axis tick labels fontsize and rotation
+            plt.xticks(range(24),fontsize=6, rotation=90, ha='right')
+            plt.ylabel('Aggregate load [kWh]', fontsize=12)
 
-            plt.ylabel('Aggregate load [kWh]')
+            # Customize legend (if needed)
+            # plt.legend(title='Day', bbox_to_anchor=(1.05, 1), loc='upper left')
 
             plt.tight_layout()
 
+        # Save the plot with a high resolution
         script_dir = os.path.dirname(__file__)
         plots_dir = os.path.join(script_dir, "..", "plots")
         os.makedirs(plots_dir, exist_ok=True)
-        plt.savefig(os.path.join(plots_dir, "Aggregate load profiles.png"))
-
+        plt.savefig(os.path.join(plots_dir, "Aggregate_load_profiles.png"), dpi=700)
 
 
 
