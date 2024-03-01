@@ -82,7 +82,7 @@ class Aggregator:
 
             # Rename the aggregated "load" column
             aggregated_df = aggregated_df.rename(columns={'load': 'Aggregate load', 'Hour_y': 'Hour'})
-            print(aggregated_df['Aggregate load'])
+
             return aggregated_df
 
         except Exception as e:
