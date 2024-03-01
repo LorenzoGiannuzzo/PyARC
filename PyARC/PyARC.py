@@ -220,7 +220,8 @@ class PyARC:
 
         # Expand the dataframe, generate load profiles, and aggregate load profiles
         output = Aggregator.expand_dataframe(merged_data)
-        output = pd.merge(output, centroids, on='Cluster', how='inner')
+        print(merged_data['Hour_y'])
+        output = pd.merge(output, centroids, on='Cluster', how='left')
         output = Aggregator.load_profile_generator(output)
         output = Aggregator.aggregate_load(output)
 

@@ -170,7 +170,7 @@ class GetFeatures:
     @staticmethod
     def calculate_weight_coefficient(df):
         # Calculate the "weight" column as "Centroid" / (Extension * sum)
-        df['weight'] = df['Centroid'] / (df['Extension']*30 * df['sum'])
+        df['weight'] = df['Centroid'] / (df['Extension'] * df['sum'])
 
         return df
     @staticmethod
