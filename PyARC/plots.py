@@ -3,6 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 import matplotlib.colors as mcolors
+import numpy as np
 
 
 def create_custom_palette(num_clusters):
@@ -40,22 +41,19 @@ class Plots:
 
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 
-
-
-
-
     @staticmethod
     def plot_cluster_centroids(cluster_centers_long_df):
-        # Dynamic number of columns in FacetGrid
+        # Dynamic number of columns and rows in FacetGrid
         num_clusters = cluster_centers_long_df['Cluster'].nunique()
+        num_cols = 2  # Imposta il numero di colonne per riga
 
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(6, 3))
 
         # Crea una palette di colori personalizzata
         custom_palette = create_custom_palette(num_clusters)
 
-        # Initialize a FacetGrid
-        g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", hue="Cluster", col_wrap=num_clusters, height=4,
+        # Initialize a FacetGrid con specifiche colonne per riga
+        g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", hue="Cluster", col_wrap=num_cols, height=4,
                           palette=custom_palette)
 
         # Draw centroid profiles for each cluster using different colors
@@ -65,15 +63,21 @@ class Plots:
         g.set_axis_labels("Hour", "Normalized Consumption")
         g.fig.suptitle("Cluster Centroids Profiles", y=1.1)  # Increased y-value to avoid title cutoff
 
-        # Adjust axes for better visualization
+        # Imposta i ticks per visualizzare i numeri sull'asse X
         g.set(xticks=list(range(24)), xlim=(0, 23), ylim=(0, 1))
+
+        # Imposta la griglia su tutti gli assi Y
+        for ax in g.axes.flat:
+            ax.yaxis.grid(True, alpha = 0.3)
+            ax.xaxis.grid(True, alpha=0.3)
+            ax.set_yticks(np.arange(0, 1.1, 0.1))
+
+        # Rotate x-axis labels on all subplots
+        for ax in g.axes.flat:
+            ax.tick_params(axis='x', labelrotation=90, labelsize=6)
 
         # Further reduce the top margin to avoid title cutoff
         plt.subplots_adjust(top=0.9)
-
-        # Rotate x-axis labels on all subplots
-        for ax in g.axes.flatten():
-            ax.set_xticklabels(ax.get_xticklabels(), fontsize=6, rotation=90, ha='right')
 
         # Get the directory path of the code
         script_dir = os.path.dirname(__file__)
@@ -110,6 +114,7 @@ class Plots:
             # Set x-axis tick labels fontsize and rotation
             plt.xticks(range(24),fontsize=6, rotation=90, ha='right')
             plt.ylabel('Aggregate load [kWh]', fontsize=12)
+            plt.grid(True, alpha=0.3)
 
             # Customize legend (if needed)
             # plt.legend(title='Day', bbox_to_anchor=(1.05, 1), loc='upper left')
