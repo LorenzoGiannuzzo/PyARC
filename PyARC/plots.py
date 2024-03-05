@@ -3,19 +3,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 import matplotlib.colors as mcolors
+import numpy as np
 
-
-def create_custom_palette(num_clusters):
-    # Definisci una palette di colori personalizzata
-    custom_palette = sns.color_palette("viridis", num_clusters)  # Puoi scegliere diversi schemi di colori
-
-    # Puoi regolare la luminosità e la saturazione dei colori
-    custom_palette = mcolors.rgb_to_hsv(custom_palette)
-    custom_palette[:, 1] = 0.8  # Regola la saturazione
-    custom_palette[:, 2] = 0.9  # Regola la luminosità
-    custom_palette = mcolors.hsv_to_rgb(custom_palette)
-
-    return custom_palette
 
 class Plots:
     @staticmethod
@@ -40,40 +29,42 @@ class Plots:
 
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 
-
-
-
-
     @staticmethod
     def plot_cluster_centroids(cluster_centers_long_df):
-        # Dynamic number of columns in FacetGrid
-        num_clusters = cluster_centers_long_df['Cluster'].nunique()
+        # Dynamic number of columns and rows in FacetGrid
+        #
+        num_cols = 2  # Set the number of columns per row
 
-        plt.figure(figsize=(12, 8))
+        # Reduce the overall size of the image
+        plt.figure(figsize=(12, 6))  # Adjust dimensions according to your preferences
 
-        # Crea una palette di colori personalizzata
-        custom_palette = create_custom_palette(num_clusters)
+        # Create a custom color palette
+        custom_palette = sns.color_palette("viridis", n_colors=len(cluster_centers_long_df['Cluster'].unique()))
 
-        # Initialize a FacetGrid
-        g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", hue="Cluster", col_wrap=num_clusters, height=4,
+        # Initialize a FacetGrid with specific columns per row and use the custom palette
+        g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", hue="Cluster", col_wrap=num_cols, height=2,
                           palette=custom_palette)
 
         # Draw centroid profiles for each cluster using different colors
-        g.map(sns.lineplot, "Hour", "Centroid")
+        # Increase the thickness of lineplots
+        g.map(sns.lineplot, "Hour", "Centroid", linewidth=2)
 
         # Add labels and title
         g.set_axis_labels("Hour", "Normalized Consumption")
-        g.fig.suptitle("Cluster Centroids Profiles", y=1.1)  # Increased y-value to avoid title cutoff
 
-        # Adjust axes for better visualization
-        g.set(xticks=list(range(24)), xlim=(0, 23), ylim=(0, 1))
+        # Set ticks to display numbers on the X-axis every 6 hours
+        g.set(xticks=list(range(0, 24, 6)), xlim=(0, 23), ylim=(0, 1))
+
+        # Set the grid on all Y-axes
+        # for ax in g.axes.flat:
+        #     ax.set_yticks(np.arange(0, 1.1, 0.1))
+
+        # Rotate X-axis labels on all subplots
+        for ax in g.axes.flat:
+            ax.tick_params(axis='x', labelrotation=0, labelsize=7)
 
         # Further reduce the top margin to avoid title cutoff
         plt.subplots_adjust(top=0.9)
-
-        # Rotate x-axis labels on all subplots
-        for ax in g.axes.flatten():
-            ax.set_xticklabels(ax.get_xticklabels(), fontsize=6, rotation=90, ha='right')
 
         # Get the directory path of the code
         script_dir = os.path.dirname(__file__)
@@ -81,38 +72,41 @@ class Plots:
         # Create the "plots" directory if it doesn't exist
         plots_dir = os.path.join(script_dir, "..", "plots")
         os.makedirs(plots_dir, exist_ok=True)
+
         plt.tight_layout()
 
         # Save the plot as an image in the "plots" directory
-        plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"), dpi=700)
+        plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"), dpi=300)  # Reduce dpi if necessary
+
 
     @staticmethod
     def plot_aggregate_loads(dataframe):
-        # Assuming 'dataframe' is your pandas DataFrame
         plt.figure(figsize=(12, 8))
 
+        # Define a vibrant color palette with shades of green, blue, and orange
+        color_palette = sns.color_palette("viridis", n_colors=len(dataframe['Month'].unique()))
+
         # Iterate over unique months in the DataFrame
-        for month in dataframe['Month'].unique():
-            plt.subplot(3, 4, month)  # Adjust the subplot grid as needed
+        for idx, month in enumerate(dataframe['Month'].unique()):
+            plt.subplot(3, 4, idx + 1)  # Adjust the subplot grid as needed
 
             # Filter data for the current month
             month_data = dataframe[dataframe['Month'] == month]
 
-            # Create a box plot for the current month
-
-            # Add a line plot for each day in the month with a more prominent color
-            sns.lineplot(x='Hour', y='Aggregate load', data=month_data, legend=None
-                         , dashes=False, linewidth=1.5, color= 'green')
+            # Create a line plot for the current month with a different color
+            sns.lineplot(x='Hour', y='Aggregate load', data=month_data, legend=None,
+                         dashes=False, linewidth=2.5, color=color_palette[idx])
 
             plt.title(f'Month: {month}', fontsize=14)
             plt.xlabel('Hour', fontsize=12)
 
-            # Set x-axis tick labels fontsize and rotation
-            plt.xticks(range(24),fontsize=6, rotation=90, ha='right')
+            # Set x-axis tick labels fontsize and rotation, display every 6th hour
+            plt.xticks(range(0, 24, 6), fontsize=10, rotation=0, ha='right')
+
             plt.ylabel('Aggregate load [kWh]', fontsize=12)
 
-            # Customize legend (if needed)
-            # plt.legend(title='Day', bbox_to_anchor=(1.05, 1), loc='upper left')
+            # Remove the grid from the plot
+            plt.grid(False)
 
             plt.tight_layout()
 
@@ -121,6 +115,7 @@ class Plots:
         plots_dir = os.path.join(script_dir, "..", "plots")
         os.makedirs(plots_dir, exist_ok=True)
         plt.savefig(os.path.join(plots_dir, "Aggregate_load_profiles.png"), dpi=700)
+
 
 
 

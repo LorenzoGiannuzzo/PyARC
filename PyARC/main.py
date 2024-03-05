@@ -18,7 +18,9 @@ class ModelManager:
 
 
     # Method to train a new model
+
     def train_new_model(self):
+
         # Set paths for input training data
         data_file_directory = os.path.join(os.path.dirname(__file__), "..", "data", "Input Training Data")
         data_file_path = os.path.join(data_file_directory, "train_data.csv")

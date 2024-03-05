@@ -106,11 +106,13 @@ class RandomForest:
             fi_df = pd.DataFrame(data)
             fi_df.sort_values(by=['feature_importance'], ascending=False, inplace=True)
 
-            plt.figure(figsize=(10, 8))
+            plt.figure(figsize=(12, 6))
             sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'], color="blue")
             plt.title(model_type + ' - Feature Importance')
             plt.xlabel('Feature Importance')
             plt.ylabel('Feature Names')
+            plt.grid(True, alpha= 0.5)
+            plt.tight_layout()
 
             plot_filename = os.path.join("..", "plots", "feature_importance_plot.png")
             plt.savefig(plot_filename)
