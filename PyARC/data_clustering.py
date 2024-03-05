@@ -6,7 +6,10 @@ import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib
 import matplotlib.pyplot as plt
+import warnings
 
+# Set the number of cores for joblib
+os.environ["LOKY_MAX_CPU_COUNT"] = "2"
 
 class Clustering:
 

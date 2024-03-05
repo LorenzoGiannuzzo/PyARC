@@ -25,23 +25,28 @@ class PyARC:
 
     def train_model(self, data_path, tou_path):
         # Load data CSV
+        print("Loading data CSV...")
         data_handler = DataCSVHandler(data_path)
         data_handler.load_csv()
         data_dataframe = data_handler.get_data()
 
         # Load TOU (Time of Use) CSV
+        print("Loading TOU CSV...")
         tou_handler = TouCSVHandler(tou_path)
         tou_handler.load_csv()
         tou_dataframe = tou_handler.get_data()
 
         # Process data using DataFrameProcessor
+        print("Processing data using DataFrameProcessor...")
         data = DataFrameProcessor(data_dataframe)
         data = data.process_dataframe()
 
         # Check TOU data
+        print("Checking TOU data...")
         DataFrameProcessor.check_tou(tou_dataframe)
 
         # Data preprocessing steps
+        print("Performing data preprocessing steps...")
         data_processor = DataPreprocessing(data)
         data = data_processor.get_negative_values()
         data = DataPreprocessing.replace_max_daily_zero_consumption(data)
@@ -52,49 +57,61 @@ class PyARC:
         data = DataPreprocessing.fill_missing_values_with_monthly_mean(data)
 
         # Normalize consumption data
+        print("Normalizing consumption data...")
         data_normalizer = DataNormalization(data)
         data = data_normalizer.normalize_consumption()
 
         # Filter users
+        print("Filtering users...")
         data = DataPreprocessing.filter_users(data)
 
         # Monthly average consumption and reshape dataframe
+        print("Calculating monthly average consumption and reshaping dataframe...")
         data = DataPreprocessing.monthly_average_consumption(data)
         data_monthly = DataPreprocessing.reshape_dataframe(data)
 
         # Plot normalized average consumption
+        print("Plotting normalized average consumption...")
         Plots.plot_norm_avg_cons(data_monthly)
 
         # Find optimal number of clusters and perform K-means clustering
+        print("Finding optimal number of clusters and performing K-means clustering...")
         optimal_number_cluster, votes = Clustering.find_optimal_cluster_number(data_monthly)
         data_monthly, centroids = Clustering.kmeans_clustering(data_monthly, optimal_number_cluster)
 
         # Merge clusters and plot cluster centroids
+        print("Merging clusters and plotting cluster centroids...")
         data = DataPreprocessing.merge_clusters(data, data_monthly)
         Plots.plot_cluster_centroids(centroids)
 
         # Export cluster centroids to CSV
+        print("Exporting cluster centroids to CSV...")
         Export.export_centroid_csv(centroids)
 
         # Spot TOU values in the corrected data
+        print("Spotting TOU values in the corrected data...")
         data = GetFeatures.spot_tou(data, tou_dataframe)
 
         # Extract features, create permutation ratios, and select features
+        print("Extracting features, creating permutation ratios, and selecting features...")
         data = GetFeatures.get_features(data)
         data = GetFeatures.create_permutation_ratios(data)
 
         features = GetFeatures.get_selected_features_and_cluster(data)
 
         # Train a Random Forest model using selected features
+        print("Training Random Forest model using selected features...")
         self.model = RandomForest.model_training(features)
 
-        # Return the trained model
-        return self.model,data
+        # Return the trained model and data
+        print("Training completed. Returning the trained model and data.")
+        return self.model, data
 
     def reconstruct_profiles(self):
         model_path = os.path.join("..", "Pre-trained Model", "random_forest_model.joblib")
 
         # Load the saved model
+        print("Loading the saved model...")
         self.model = joblib.load(model_path)
 
         data_path = os.path.join("..", "data", "Input Data", "data.csv")
@@ -106,6 +123,7 @@ class PyARC:
         data = data_handler.get_data()
 
         # Load TOU (Time of Use) CSV
+        print("Loading TOU CSV...")
         tou_handler = TouCSVHandler(tou_path)
         tou_handler.load_csv()
         tou = tou_handler.get_data()
@@ -115,6 +133,7 @@ class PyARC:
         centroids = centroids_handler.get_data()
 
         # Extract features, create permutation ratios, and select features
+        print("Extracting features, creating permutation ratios, and selecting features...")
         data = GetFeatures.get_features2(data)
 
         # Get feature names used by the model
@@ -145,15 +164,18 @@ class PyARC:
         centroids = GetFeatures.numeric_to_words(centroids)
 
         # Generate Output
+        print("Generating output...")
         output = Aggregator.expand_dataframe(merged_data)
         output = pd.merge(output, centroids, on='Cluster', how='inner')
         output = Aggregator.load_profile_generator(output)
         output = Aggregator.aggregate_load(output)
 
         # Plot aggregate loads
+        print("Plotting aggregate loads...")
         Plots.plot_aggregate_loads(output)
 
         # Export output to CSV
+        print("Exporting output to CSV...")
         Export.export_output_csv(output)
 
         return output
@@ -163,6 +185,7 @@ class PyARC:
         model_path = os.path.join("..", "User-trained Model", "random_forest_model.joblib")
 
         # Load the saved Random Forest model
+        print("Loading the saved Random Forest model...")
         model = joblib.load(model_path)
 
         # Define paths to the input data files
@@ -184,6 +207,7 @@ class PyARC:
         centroids = centroids_handler.get_data()
 
         # Extract features and perform additional feature engineering
+        print("Extracting features and performing additional feature engineering...")
         data = GetFeatures.get_features2(data)
 
         # Get feature names used by the model
@@ -220,12 +244,13 @@ class PyARC:
 
         # Expand the dataframe, generate load profiles, and aggregate load profiles
         output = Aggregator.expand_dataframe(merged_data)
-        print(merged_data['Hour_y'])
+
         output = pd.merge(output, centroids, on='Cluster', how='left')
         output = Aggregator.load_profile_generator(output)
         output = Aggregator.aggregate_load(output)
 
         # Plot aggregate loads and export the output data to CSV
+        print("Plotting aggregate loads and exporting output to CSV...")
         Plots.plot_aggregate_loads(output)
         Export.export_output_csv(output)
 

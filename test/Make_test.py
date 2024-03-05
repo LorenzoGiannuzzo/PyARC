@@ -20,7 +20,7 @@ def remove_90_percent_rows(df):
     unique_users = df['User'].unique()
 
     # Calculate the number of users to keep (10%)
-    num_users_to_keep = int(0.01 * len(unique_users))
+    num_users_to_keep = int(0.05 * len(unique_users))
 
     # Randomly select 10% of users to keep
     users_to_keep = np.random.choice(unique_users, num_users_to_keep, replace=False)

@@ -107,7 +107,7 @@ class RandomForest:
             fi_df.sort_values(by=['feature_importance'], ascending=False, inplace=True)
 
             plt.figure(figsize=(10, 8))
-            sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'])
+            sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'], color="blue")
             plt.title(model_type + ' - Feature Importance')
             plt.xlabel('Feature Importance')
             plt.ylabel('Feature Names')
