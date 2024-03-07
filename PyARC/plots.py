@@ -2,9 +2,6 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
-import matplotlib.colors as mcolors
-import numpy as np
-
 
 class Plots:
     @staticmethod

@@ -1,5 +1,3 @@
-import pandas as pd
-
 
 class DataNormalization:
     def __init__(self, dataframe):

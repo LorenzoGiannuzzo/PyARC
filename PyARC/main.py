@@ -18,7 +18,6 @@ class ModelManager:
 
 
     # Method to train a new model
-
     def train_new_model(self):
 
         # Set paths for input training data
