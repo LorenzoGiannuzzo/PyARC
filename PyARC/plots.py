@@ -83,12 +83,20 @@ class Plots:
         # Define a vibrant color palette with shades of green, blue, and orange
         color_palette = sns.color_palette("viridis", n_colors=len(dataframe['Month'].unique()))
 
+        # Initialize variables to store global minimum and maximum values
+        local_min = dataframe['Aggregate load'].min()
+        local_max = dataframe['Aggregate load'].max()
+
         # Iterate over unique months in the DataFrame
         for idx, month in enumerate(dataframe['Month'].unique()):
             plt.subplot(3, 4, idx + 1)  # Adjust the subplot grid as needed
 
             # Filter data for the current month
             month_data = dataframe[dataframe['Month'] == month]
+
+            # Update global minimum and maximum values
+
+
 
             # Create a line plot for the current month with a different color
             sns.lineplot(x='Hour', y='Aggregate load', data=month_data, legend=None,
@@ -104,15 +112,18 @@ class Plots:
 
             # Remove the grid from the plot
             plt.grid(False)
-
+            # Set a common y-axis limit for all subplots
+            plt.ylim(local_min, local_max)
             plt.tight_layout()
+
+
+
 
         # Save the plot with a high resolution
         script_dir = os.path.dirname(__file__)
         plots_dir = os.path.join(script_dir, "..", "plots")
         os.makedirs(plots_dir, exist_ok=True)
         plt.savefig(os.path.join(plots_dir, "Aggregate_load_profiles.png"), dpi=700)
-
 
 
 
