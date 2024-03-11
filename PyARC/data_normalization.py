@@ -9,7 +9,7 @@ class DataNormalization:
             if 'Consumption' not in self.dataframe.columns:
                 raise ValueError("The 'Consumption' column is not present in the dataframe.")
 
-            # Check if the dataframe is not empty
+            # Check if the dataframe is no empty
             if self.dataframe.empty:
                 raise ValueError("The dataframe is empty.")
 
