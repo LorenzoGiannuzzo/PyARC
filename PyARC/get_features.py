@@ -155,6 +155,7 @@ class GetFeatures:
         df['Extension'] = extension_per_cluster
 
         return df
+
     @staticmethod
     def calculate_sum_column(df):
         # Filter the dataframe for the most frequent "ToU"
@@ -167,12 +168,14 @@ class GetFeatures:
         df = pd.merge(df, sum_per_cluster.reset_index(name='sum'), on='Cluster', how='left')
 
         return df
+
     @staticmethod
     def calculate_weight_coefficient(df):
         # Calculate the "weight" column as "Centroid" / (Extension * sum)
         df['weight'] = df['Centroid'] / (df['Extension'] * df['sum'])
 
         return df
+
     @staticmethod
     def numeric_to_words(df):
         # Map numbers to words

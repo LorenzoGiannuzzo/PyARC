@@ -1,16 +1,14 @@
 # Import necessary libraries
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.metrics import davies_bouldin_score
-
-
 
 class DataPreprocessing:
     def __init__(self, dataframe):
+        # Initialize the DataPreprocessing class with the input DataFrame
         self.dataframe = dataframe
 
     def get_negative_values(self):
+        # Replace negative values in the 'Consumption' column with NaN
         if "Consumption" in self.dataframe.columns:
             self.dataframe["Consumption"] = np.where(self.dataframe["Consumption"] < 0, np.nan, self.dataframe["Consumption"])
             return self.dataframe
@@ -20,6 +18,7 @@ class DataPreprocessing:
 
     @staticmethod
     def replace_max_daily_zero_consumption(dataframe):
+        # Replace the maximum daily zero consumption with NaN
         max_zero_mask = (dataframe["Consumption"] == 0) & ~dataframe["Consumption"].isna()
         max_zero_profiles = dataframe[max_zero_mask].groupby(["User", "Year", "Month", "Day"])["Consumption"].idxmax()
         dataframe.loc[max_zero_profiles, "Consumption"] = np.nan
@@ -27,6 +26,7 @@ class DataPreprocessing:
 
     @staticmethod
     def interpolate_missing_values(df, max_gap=3):
+        # Interpolate missing values in the 'Consumption' column within user groups
         df = df.sort_values(by=["User", "Year", "Month", "Day"])
         df['Consumption'] = pd.to_numeric(df['Consumption'], errors='coerce')
 
@@ -43,6 +43,7 @@ class DataPreprocessing:
 
     @staticmethod
     def fill_missing_values_with_monthly_mean(df):
+        # Fill missing values in the 'Consumption' column with monthly means
         df = df.sort_values(by=["User", "Year", "Month", "Day"])
         monthly_means = df.groupby(["User", "Year", "Month"])["Consumption"].mean().reset_index()
         df_filled = pd.merge(df, monthly_means, on=["User", "Year", "Month"], how="left", suffixes=('', '_mean'))
@@ -52,6 +53,7 @@ class DataPreprocessing:
 
     @staticmethod
     def remove_outliers_iqr(df):
+        # Remove outliers in the 'Consumption' column using the Interquartile Range (IQR) method
         column_name = "Consumption"
         q1 = df[column_name].quantile(0.25)
         q3 = df[column_name].quantile(0.75)
@@ -60,10 +62,12 @@ class DataPreprocessing:
         upper_bound = q3 + 1.5 * iqr
         df[column_name] = df[column_name].apply(lambda x: x if lower_bound <= x <= upper_bound else None)
         return df
+
     @staticmethod
     def filter_users(df):
+        # Filter out users with incomplete hourly data
         df = df.sort_values(by=["User", "Year", "Month", "Day"])
-        # Converti la colonna "Hour" in valori numerici se non è già di tipo numerico
+        # Convert the "Hour" column to numeric if not already
         if not pd.api.types.is_numeric_dtype(df['Hour']):
             df['Hour'] = pd.to_numeric(df['Hour'], errors='coerce')
 
@@ -71,26 +75,27 @@ class DataPreprocessing:
         valid_users_series = df.groupby(["User", "Year", "Month", "Day"])["Hour"].apply(
             lambda x: set(x) == set(range(24)))
 
-        # Creazione di un nuovo DataFrame con le colonne "User", "Year", "Month", "Day", "Valid"
+        # Create a new DataFrame with columns "User", "Year", "Month", "Day", "Valid"
         valid_df = pd.DataFrame(valid_users_series).reset_index()
         valid_df.columns = ["User", "Year", "Month", "Day", "Valid"]
 
-        # Filtraggio del DataFrame in base agli utenti validi
+        # Filter the DataFrame based on valid users
         filtered_df = df[df["User"].isin(valid_df[valid_df["Valid"]]["User"])]
 
-        # Calcolo del numero di utenti eliminati
+        # Calculate the number of eliminated users
         num_users_eliminated = len(df["User"].unique()) - len(filtered_df["User"].unique())
 
         # Output message
         print(f"{num_users_eliminated} users eliminated. DataFrame processed successfully.")
 
         return filtered_df
+
     @staticmethod
     def monthly_average_consumption(dataframe):
         # Create a copy of the input DataFrame
         result_df = dataframe.copy()
 
-        # Group the DataFrame by User, Year, and Month
+        # Group the DataFrame by User, Year, Month, and Hour
         grouped_df = result_df.groupby(["User", "Year", "Month", "Hour"])
 
         # Calculate the monthly average normalized consumption
@@ -100,58 +105,17 @@ class DataPreprocessing:
 
     @staticmethod
     def reshape_dataframe(input_df):
-
-        grouped_df = input_df.groupby(['User', 'Year', 'Month','Hour'])['M_consumption'].mean().reset_index()
+        # Group the input DataFrame by 'User', 'Year', 'Month', and 'Hour' and calculate the mean
+        grouped_df = input_df.groupby(['User', 'Year', 'Month', 'Hour'])['M_consumption'].mean().reset_index()
 
         return grouped_df
 
-
     @staticmethod
-    def infrequent_profiles(df):
-
-        result_df = pd.DataFrame()
-
-
-        for dayname in df['Dayname'].unique():
-
-            day_df = df[df['Dayname'] == dayname]
-            daily_profiles = day_df.groupby(["Year", "Month", "Day"])["Norm_consumption"].apply(list).reset_index()
-
-            best_num_clusters = None
-            best_dbi_score = float('inf')
-
-            for num_clusters in range(7, 21):
-                kmeans = KMeans(n_clusters=num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
-                clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
-
-                dbi_score = davies_bouldin_score(list(daily_profiles["Norm_consumption"]), clusters)
-
-                if dbi_score < best_dbi_score:
-                    best_dbi_score = dbi_score
-                    best_num_clusters = num_clusters
-
-            kmeans = KMeans(n_clusters=best_num_clusters, n_init=100, max_iter=700, algorithm='lloyd')
-            clusters = kmeans.fit_predict(list(daily_profiles["Norm_consumption"]))
-
-            max_users = df["User"].nunique()
-            max_profiles = len(df["Norm_consumption"])
-
-            low_populated_clusters = []
-            for cluster_id in range(best_num_clusters):
-                cluster_users = day_df[clusters == cluster_id]["User"].nunique()
-                cluster_profiles = sum(clusters == cluster_id)
-                if cluster_users < 0.05 * max_users or cluster_profiles < 0.05 * max_profiles:
-                    low_populated_clusters.append(cluster_id)
-
-            updated_day_df = day_df[~clusters.isin(low_populated_clusters)]
-
-            result_df = pd.concat([result_df, updated_day_df])
-
-        return result_df
-
     def merge_clusters(main_df, smaller_df):
+        # Merge clusters based on 'User', 'Year', 'Month', and 'Hour'
         merged_df = pd.merge(main_df, smaller_df[['User', 'Year', 'Month', 'Hour', 'Cluster']],
                              on=['User', 'Year', 'Month', 'Hour'], how='left')
         main_df['Cluster'] = merged_df['Cluster']
 
         return main_df
+

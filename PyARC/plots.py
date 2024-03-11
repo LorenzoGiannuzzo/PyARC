@@ -3,6 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 
+
 class Plots:
     @staticmethod
     def plot_norm_avg_cons(data):
@@ -17,7 +18,6 @@ class Plots:
         plt.ylabel("Normalized Average Monthly Consumption")
         plt.title("Normalized Average Monthly Consumption Profiles")
         plt.ylim(0, 1)
-
 
         # Save the plot as a .png file in the "plots" directory
         script_dir = os.path.dirname(__file__)  # Get the directory of the current script
@@ -75,7 +75,6 @@ class Plots:
         # Save the plot as an image in the "plots" directory
         plt.savefig(os.path.join(plots_dir, "Cluster_Centroids_Profiles.png"), dpi=300)  # Reduce dpi if necessary
 
-
     @staticmethod
     def plot_aggregate_loads(dataframe):
         plt.figure(figsize=(12, 8))
@@ -96,8 +95,6 @@ class Plots:
 
             # Update global minimum and maximum values
 
-
-
             # Create a line plot for the current month with a different color
             sns.lineplot(x='Hour', y='Aggregate load', data=month_data, legend=None,
                          dashes=False, linewidth=2.5, color=color_palette[idx])
@@ -115,9 +112,6 @@ class Plots:
             # Set a common y-axis limit for all subplots
             plt.ylim(local_min, local_max)
             plt.tight_layout()
-
-
-
 
         # Save the plot with a high resolution
         script_dir = os.path.dirname(__file__)

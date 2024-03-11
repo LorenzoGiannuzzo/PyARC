@@ -180,7 +180,6 @@ class PyARC:
 
         return output
 
-    @staticmethod
     def user_trained_model(self):
         # Define the path to the user-trained model
         model_path = os.path.join("..", "User-trained Model", "random_forest_model.joblib")

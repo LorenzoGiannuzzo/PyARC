@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class CSVHandler:
     def __init__(self, file_path):
         self.file_path = file_path

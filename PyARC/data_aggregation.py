@@ -56,9 +56,8 @@ class Aggregator:
                 df['load'] = df['weight'] * df[column_name]
 
             output_csv_path = os.path.join(os.path.dirname(__file__), "..", "test", "test3.csv")
-            df = df.drop_duplicates(subset=['User', 'Year', 'Month', 'Day', 'Hour_y'])
+            df = df.drop_duplicates(subset=['User', 'Year', 'Month', 'Day', 'Hour_y']) #this line prevent the dataframe from duplication lines and compromise the aggregate self consumption when summing
             df[['User', 'Month', 'Day', 'Hour_y', 'F1', 'load']].to_csv(output_csv_path, index=False)
-
 
             return df
 

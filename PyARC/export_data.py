@@ -1,7 +1,6 @@
 # Import necessary libraries
 import os
 
-
 class Export:
     @staticmethod
     def export_centroid_csv(data):

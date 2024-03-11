@@ -15,8 +15,6 @@ class ModelManager:
         # Reconstruct profiles using the pre-trained model
         self.pyarc_instance.reconstruct_profiles()
 
-
-
     # Method to train a new model
     def train_new_model(self):
 
