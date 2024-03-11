@@ -5,7 +5,7 @@
 
 _(a) Energy Center Lab, Polytechnic of Turin, via Paolo Borsellino 38/16, 10152, Turin, Italy_ _(b) Department of Energy (DENERG), Polytechnic of Turin, Corso Duca degli Abruzzi 24, 10129, Turin, Italy_
 
-PyARC Software - Python Algorithm for Residential load profiles reConstruction (Python 3.12.1).
+PyARC Software - Python Algorithm for Residential load profiles reConstruction ==(Python 3.12.1).==
 
 ## Overview
 
@@ -31,7 +31,7 @@ PyARC is a Python-developed software designed for the reconstruction of resident
 
 ## How to Run:
 
-1. Install necessary libraries typing in the terminal: `pip install -r requirements.txt`
+1. Install necessary libraries typing in the terminal: ==`[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)pip install -r requirements.txt`==
 
 2. Ensure the necessary libraries are installed (required libraries are defined in the `requirement.txt` file)
 
@@ -77,15 +77,15 @@ The main output of the model training process is a RandomForest classifier which
 
 The secondary output is:
 
-- Cluster centroids obtained during the clustering process, which are saved in the `plots` folder in .png format as `Cluster_Centroids_Profiles.png`;
+- Cluster centroids obtained during the clustering process, which are saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Cluster_Centroids_Profiles.png`;
 
-- The Davies-Bouldin Index values used to evaluate the optimal number of clusters, which is saved in the `plots` folder in .png format as `Davies-Boulding Index vs Number of CLusters.png` ;
+- The Davies-Bouldin Index values used to evaluate the optimal number of clusters, which is saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Davies-Boulding Index vs Number of CLusters.png` ;
 
-- The "Elbow Method" metric values used to evaluate the optimal number of clusters, which are saved in the `plots` folder in .png format as `Elbow Method vs Number of Clusters.png`;
+- The "Elbow Method" metric values used to evaluate the optimal number of clusters, which are saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Elbow Method vs Number of Clusters.png`;
 
-- The Silhouette score values used to evaluate the optimal number of clusters, which are saved in the `plots` folder in .png format as `Silhouette Score vs Number of Clusters.png`;
+- The Silhouette score values used to evaluate the optimal number of clusters, which are saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Silhouette Score vs Number of Clusters.png`;
 
-- The importance of the features used by the RandomForest to perform the classification task, save in the `plots` folder as `feature_importance_plot.png` ;
+- The importance of the features used by the RandomForest to perform the classification task, save in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder as `feature_importance_plot.png` ;
 
 - A file .txt containing the accuracy of the RandomForest during training and test, which is saved in the `docs/User-trained Model Metrics` folder as `User_trained_model_metrics.txt`.
 
@@ -95,7 +95,7 @@ The output of the reconstruction of the residential aggregate load profile proce
 
 - A file containing the time series of the aggregate electrical load profile in CSV format, which is saved in the `data/Output Data` folder.
 
-- The plot of the aggregate electrical load profiles for each month, which is saved in the `plots` folder in .png format as `Aggregate load profiles.png`.
+- The plot of the aggregate electrical load profiles for each month, which is saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Aggregate load profiles.png`.
 
 - **Reconstruction using User-trained Model:**
 
@@ -107,7 +107,7 @@ The output of the process is the same as the - **Reconstruction using Pre-trai
 
 where: - "User": is a char/string which contains usernames; - "Year": is a numerical value which represents the year when electrical energy was measured; - "Month": is a numerical value which represents the months when electrical energy was measured; - "Day": is a numerical value which represents the number of days when electrical energy was measured; - "Hour": is a numerical value which represents the hours when electrical energy was measured; -"Aggregate load": contains electrical energy consumption of the residential aggregate expressed in [kWh].
 
-- The plot of the aggregate electrical load profiles for each month, which is saved in the `plots` folder in .png format as `Aggregate load profiles.png`.
+- The plot of the aggregate electrical load profiles for each month, which is saved in the `[![](http://localhost:63342/markdownPreview/329293930/commandRunner/run.png)](http://localhost:63342/markdownPreview/329293930/markdown-preview-index-474745826.html?_ijt=c3hqlbntto5b49cmqfpj5epgqn#)plots` folder in .png format as `Aggregate load profiles.png`.
 
 ## Directory Structure:
 
