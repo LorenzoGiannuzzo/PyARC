@@ -840,3 +840,22 @@ These methods are designed for specific feature engineering tasks, contributing
 - It uses seaborn's boxplot to show the distribution of loads and overlays line plots for each day in the month without dashes.
 
 - The resulting set of subplots is saved collectively as "Aggregate load profiles.png" in the "plots" directory.
+
+## Practical Examples:
+
+This section describes some short practical examples of how to use the software. After running the main.py file, the following screen appears via terminals:
+
+Welcome to PyARC! What would you like to do?
+
+1. Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model
+
+2. Train a new model
+
+3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model
+
+Selecting the first of the three entries (thus writing through terminal the number 1), will perform to reconstruction of the hourly residential profile of the set of users described through their monthly consumption (according to the modalities and files described in the previous sections) through the pre-trained model already present in the software directory.
+
+Instead, selecting the second of the three items (thus writing via terminal the number 2) will perform creation of a new model via the modalities and files described in the previous sections through the custom data entered by the software user.
+
+Finally, by selecting the third item (thus writing via terminal the number 3), one will make use of the model trailed by the software user via voice n.2, for reconstruction of the hourly profile of the set of users described via their monthly consumption, similarly to what can be executed by voice n.1.
+
