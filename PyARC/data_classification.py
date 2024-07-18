@@ -8,6 +8,11 @@ from joblib import dump
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from joblib import parallel_backend
+
+import multiprocessing as mp
+
+
 
 
 class RandomForest:
@@ -42,7 +47,7 @@ class RandomForest:
 
     def _train_model(self):
         # Create a RandomForest model and perform hyperparameter tuning using GridSearchCV
-        rf_model = RandomForestClassifier(criterion='gini', max_depth=None, random_state=42)
+        rf_model = RandomForestClassifier(criterion='gini', max_depth=None, random_state=42, n_jobs= os.cpu_count()-1)
 
         param_grid = {
             'n_estimators': [50, 500],
@@ -126,19 +131,13 @@ class RandomForest:
         random_forest_instance = RandomForest()
 
         random_forest_instance._load_dataframe(df)
-
         random_forest_instance._convert_cluster_to_word()
-
         random_forest_instance._extract_features_target()
-
         random_forest_instance._split_dataset()
 
         random_forest_instance._train_model()
-
         random_forest_instance._evaluate_model()
-
         random_forest_instance._save_model()
-
         random_forest_instance._plot_feature_importance()
 
         return random_forest_instance.model
