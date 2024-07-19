@@ -1,5 +1,6 @@
 # Import necessary libraries
 import os
+import time
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
@@ -47,7 +48,8 @@ class RandomForest:
 
     def _train_model(self):
         # Create a RandomForest model and perform hyperparameter tuning using GridSearchCV
-        rf_model = RandomForestClassifier(criterion='gini', max_depth=None, random_state=42, n_jobs= os.cpu_count()-1)
+        tic = time.time()
+        rf_model = RandomForestClassifier(criterion='gini', max_depth=None, random_state=42,n_jobs= os.cpu_count()-1)
 
         param_grid = {
             'n_estimators': [50, 500],
@@ -56,9 +58,12 @@ class RandomForest:
             'max_features': [1, 2, 3, 4, 5]
         }
 
-        grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, cv=5, scoring='accuracy')
+        grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, cv=5, scoring='accuracy', n_jobs=os.cpu_count()-1)
         grid_search.fit(self.X_train, self.y_train)
 
+        toc = time.time()
+
+        print(toc-tic)
         # Save the model with the best parameters
         self.model = grid_search.best_estimator_
 
