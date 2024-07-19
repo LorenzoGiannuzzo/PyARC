@@ -869,7 +869,7 @@ In this section, the process that was undertaken to obtain the pre-trained model
 
 As described in previously, a K-means clustering was performed to identify the normalized typical load patterns as centroids of the obtained clusters. Then, a Random Forest is trained to build a model capable of detecting the load patterns of residential users based on features extracted from monthly electricity bills. The obtained cluster centroids (Figure 1) are then saved in the software’s folder.
 
-![[Pasted image 20240719102856.png]]
+![Fig_1.png](READme%20Figures%2FFig_1.png)
 **Figure** **1****.** Cluster Centroids were obtained during the pre-trained model training.
 
 As stated  reviously, once cluster centroids were obtained, training features were extracted from the input data, and the classification model was trained. The obtained classification model performance is summarised in Table 1, which is evaluated as the classifier's ability to successfully assign a user to its correct cluster as already described in our previous work [2], and the feature importance is presented in Figure 2, where a ranking of the most useful features used for the classification task is shown.
@@ -881,7 +881,7 @@ As stated  reviously, once cluster centroids were obtained, training features we
 |**Classification performance metrics**|**Value**|
 |Accuracy (train)|90.44%|
 |Accuracy (test)|89.37%|
-![[Pasted image 20240719103255.png]]
+![Fig_2.png](READme%20Figures%2FFig_2.png)
 **Figure 2.** Feature importance ranking for the pre-trained model.
 
 The figure shows that among the selected features, the most relevant for the pre-trained classification model was the total monthly consumption, the consumption in the three different ToU periods, and then the ratio between these values.
@@ -899,7 +899,7 @@ Welcome to PyARC! What would you like to do?
 3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model
 
 As previously stated, the aggregate load profiles on a monthly basis (Figure 3) are obtained by combining the classification model and the user-specific rescaling coefficient calculated through Equation 1.
-![[Pasted image 20240719103428.png]]
+![Fig_3.png](READme%20Figures%2FFig_3.png)
 **Figure 3.** Aggregated electrical load profiles for each month.
 
 For this specific example, data corresponding to March are missing for the reasons given in [3] and [2], namely the maintenance of smart meters.
@@ -918,9 +918,17 @@ If option number 3 is selected, the software performs the same steps as in optio
 
 The results obtained are similar to those of the previous example, but differ in that they are obtained through a different model. Additionally, to provide a different example, the input data in the "Input Data" folder was slightly modified, as  Figure 4 shows.
 
-![[Pasted image 20240719111256.png]]
+![Fig_4.png](READme%20Figures%2FFig_4.png)
 **Figure 4.** Aggregated electrical load profiles for each month using the user-trained model.
 
+Figure 5 shows the feature importance of the user-trained model and Figure 6 shows the new cluster centroids, in which is crearly evident how differently the software extracts new features and centroids from different data.
+
+![Fig_5.png](READme%20Figures%2FFig_5.png)
+**Figure 5.** Feature importance ranking for the user-trained model.
+
+
+![Fig_6.png](READme%20Figures%2FFig_6.png)
+**Figure** **6****.** Cluster Centroids were obtained during the user-trained model training.
 ## References
 
 [1] Schofield JT, Carmichael R, Tindemans SH, Bilton M, Woolf M, Strbac G. Low Carbon London Project: Data from the Dynamic Time-of-Use Electricity Pricing Trial, 2013 2016. [https://doi.org/10.5255/ukda-sn-7857-2](https://doi.org/10.5255/ukda-sn-7857-2).
