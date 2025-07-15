@@ -36,7 +36,7 @@ class ModelManager:
 
 # Function to start the program
 def start_program():
-    print("\nWelcome to PyARC! What would you like to do?\n")
+    print("\n---------------------------------------------------\nWelcome to PyARC! What would you like to do?\n")
     print("1. Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model")
     print("2. Train a new model")
     print("3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model")
