@@ -25,7 +25,7 @@ class PyARC:
 
     def train_model(self, data_path, tou_path):
         # Load data CSV
-        print(" ~ Loading data CSV...")
+        print("\n---------------------------------------------------\n ~ Loading data CSV...")
         data_handler = DataCSVHandler(data_path)
         data_handler.load_csv()
         data_dataframe = data_handler.get_data()
@@ -111,7 +111,7 @@ class PyARC:
         model_path = os.path.join("..", "Pre-trained Model", "random_forest_model.joblib")
 
         # Load the saved model
-        print(" ~ Loading the saved model...")
+        print("\n---------------------------------------------------\n ~ Loading the saved model...")
         self.model = joblib.load(model_path)
 
         data_path = os.path.join("..", "data", "Input Data", "data.csv")
@@ -185,7 +185,7 @@ class PyARC:
         model_path = os.path.join("..", "User-trained Model", "random_forest_model.joblib")
 
         # Load the saved Random Forest model
-        print(" ~ Loading the saved Random Forest model...")
+        print("\n---------------------------------------------------\n ~ Loading the saved Random Forest model...")
         model = joblib.load(model_path)
 
         # Define paths to the input data files
