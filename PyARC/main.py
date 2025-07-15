@@ -36,13 +36,13 @@ class ModelManager:
 
 # Function to start the program
 def start_program():
-    print("Welcome to PyARC! What would you like to do?")
+    print("\nWelcome to PyARC! What would you like to do?\n")
     print("1. Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model")
     print("2. Train a new model")
     print("3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model")
 
     # Get user input for the desired action
-    choice = input("Enter the number corresponding to the desired action: ")
+    choice = input("\nEnter the number corresponding to the desired action: ")
 
     # Create an instance of ModelManager
     model_manager = ModelManager()
@@ -50,15 +50,15 @@ def start_program():
     # Execute the chosen action
     if choice.strip() == "1":
         model_manager.use_pretrained_model()
-        print("Pre-trained model successfully used to reconstruct profiles.")
+        print("\n---------------------------------------------------\nPre-trained model successfully used to reconstruct profiles.\n\n ~ Output Data generated are located in '...\\data\\Output Data' folder.\n ~ Output Plots are located in '...\\plots' folder.\n\nThanks for using PyARC!")
     elif choice.strip() == "2":
         model_manager.train_new_model()
-        print("New model successfully trained.")
+        print("\n---------------------------------------------------\nNew model successfully trained.\n\n ~ Your new trained model located in '...\\User_trained Model' folder.\n\n Thanks for using PyARC!")
     elif choice.strip() == "3":
         model_manager.use_user_trained_model()
-        print("User-trained model successfully used to reconstruct profiles.")
+        print("\n---------------------------------------------------\nUser-trained model successfully used to reconstruct profiles.\n\n ~ Output Data generated are located in '...\\data\\Output Data' folder.\n ~ Output Plots are located in '...\\plots' folder.\n\nThanks for using PyARC!")
     else:
-        print("Invalid choice. Please enter a valid number.")
+        print("\n---------------------------------------------------\nInvalid choice. Please enter a valid number.")
 
 
 # Entry point for the script

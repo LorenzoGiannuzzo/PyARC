@@ -23,6 +23,7 @@ class Plots:
         script_dir = os.path.dirname(__file__)  # Get the directory of the current script
         plots_dir = os.path.join(script_dir, "..", "plots")  # Navigate to the "plots" directory
         os.makedirs(plots_dir, exist_ok=True)  # Create the "plots" directory if it doesn't exist
+        plt.tight_layout()
 
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 
@@ -36,7 +37,7 @@ class Plots:
         plt.figure(figsize=(12, 6))  # Adjust dimensions according to your preferences
 
         # Create a custom color palette
-        custom_palette = sns.color_palette("viridis", n_colors=len(cluster_centers_long_df['Cluster'].unique()))
+        custom_palette = sns.color_palette("magma", n_colors=len(cluster_centers_long_df['Cluster'].unique()))
 
         # Initialize a FacetGrid with specific columns per row and use the custom palette
         g = sns.FacetGrid(cluster_centers_long_df, col="Cluster", hue="Cluster", col_wrap=num_cols, height=2,
@@ -80,7 +81,7 @@ class Plots:
         plt.figure(figsize=(12, 8))
 
         # Define a vibrant color palette with shades of green, blue, and orange
-        color_palette = sns.color_palette("viridis", n_colors=len(dataframe['Month'].unique()))
+        color_palette = sns.color_palette("magma", n_colors=len(dataframe['Month'].unique()))
 
         # Initialize variables to store global minimum and maximum values
         local_min = dataframe['Aggregate load'].min()
@@ -110,12 +111,14 @@ class Plots:
             # Remove the grid from the plot
             plt.grid(False)
             # Set a common y-axis limit for all subplots
-            plt.ylim(local_min, local_max)
+            plt.ylim(local_min*0.9, local_max*1.1)
             plt.tight_layout()
+            plt.grid()
 
         # Save the plot with a high resolution
         script_dir = os.path.dirname(__file__)
         plots_dir = os.path.join(script_dir, "..", "plots")
+        plt.tight_layout()
         os.makedirs(plots_dir, exist_ok=True)
         plt.savefig(os.path.join(plots_dir, "Aggregate_load_profiles.png"), dpi=700)
 

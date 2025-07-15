@@ -859,15 +859,15 @@ Welcome to PyARC! What would you like to do?
 
 3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model
 
-Selecting the first of the three entries (thus writing through terminal the number 1), will perform to reconstruction of the hourly residential profile of the set of users described through their monthly consumption (according to the modalities and files described in the previous sections) through the pre-trained model already present in the software directory.
+•	Select Option #1 writing through terminal the number 1. This option will perform to reconstruction of the hourly residential profile of the set of users described through their monthly consumption (according to the modalities and files described in the previous sections) through the pre-trained model already present in the software directory.
+•	Select Option #2 writing through terminal the number 2. This option will perform creation of a new model via the modalities and files described in the previous sections through the custom data entered by the software user.
+•	Select Option #3 writing through terminal the number 3. This opttion will make use of the model trailed by the software user via option #2, for reconstruction of the hourly profile of the set of users described via their monthly consumption, similarly to what can be executed by option #1.
 
-Instead, selecting the second of the three voices (thus writing via terminal the number 2) will perform creation of a new model via the modalities and files described in the previous sections through the custom data entered by the software user.
+OPTION 2#
 
-Finally, by selecting the third item (thus writing via terminal the number 3), one will make use of the model trailed by the software user via voice n.2, for reconstruction of the hourly profile of the set of users described via their monthly consumption, similarly to what can be executed by voice n.1.
+In this section , the process that was undertaken to obtain the pre-trained model is described, and the reconstruction of the load profiles of an aggregate composed by six residential users randomly chosen from data described in [1] is shown, as an example of the software functionalities application. To obtain the pre-trained model, the train_model() function was used running the main and choosing option 2 from the command line (Train a new PyARC model), using the data described in [1] and the ToU defined in Table 1 by moving the data from the Default Training Data to the Input Training Data folder, and correctly renaming the files in “train_data.csv” and “train_tou.csv”.
+As described in previously , a K-means clustering was performed to identify the normalized typical load patterns as centroids of the obtained clusters. Then, a Random Forest is trained to build a model capable of detecting the load patterns of residential users based on features extracted from monthly electricity bills. The obtained cluster centroids (Figure 1) are then saved in the software’s folder.
 
-In this section, the process that was undertaken to obtain the pre-trained model is described, and the reconstruction of the load profiles of an aggregate composed by six residential users randomly chosen from data described in [1] is shown, as an example of the software functionalities application. To obtain the pre-trained model, the train_model() function was used running the main and choosing option 2 from the command line (Train a new PyARC model), using the data described in [1] and the ToU defined in Table 1 by moving the data from the Default Training Data to the Input Training Data folder, and correctly renaming the files in “train_data.csv” and “train_tou.csv”.
-
-As described in previously, a K-means clustering was performed to identify the normalized typical load patterns as centroids of the obtained clusters. Then, a Random Forest is trained to build a model capable of detecting the load patterns of residential users based on features extracted from monthly electricity bills. The obtained cluster centroids (Figure 1) are then saved in the software’s folder.
 
 ![Fig_1.png](READme%20Figures%2FFig_1.png)
 **Figure** **1****.** Cluster Centroids were obtained during the pre-trained model training.
@@ -890,32 +890,20 @@ As previously stated, the entire process performed to create the pre-trained mod
 
 After obtaining the pre-trained model, an example of the software application is made using monthly data extracted from some randomly selected users from the data described in [1]. The pre-trained model is used via reconstruct_profiles() to reconstruct the aggregate load profiles by running the main and choosing from command line option 1 (Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model), and by using the input data correctly named and placed in the Input Data folder, following data requirements described previously.
 
-Welcome to PyARC! What would you like to do?
+OPTION 1#
 
-1. Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model
+As previously stated , the aggregate load profiles on a monthly basis (Figure 3) are obtained by combining the classification model and the user-specific rescaling coefficient.
 
-2. Train a new model
 
-3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained model
-
-As previously stated, the aggregate load profiles on a monthly basis (Figure 3) are obtained by combining the classification model and the user-specific rescaling coefficient calculated through Equation 1.
 ![Fig_3.png](READme%20Figures%2FFig_3.png)
 **Figure 3.** Aggregated electrical load profiles for each month.
 
 For this specific example, data corresponding to March are missing for the reasons given in [3] and [2], namely the maintenance of smart meters.
-
 In addition, another example is given where the third function of those available from the software is used, which is the use of a drag model on the data entered by the user of the software in the appropriate directory, as explained earlier.
 
-Welcome to PyARC! What would you like to do?
-
-1. Reconstruct Residential Aggregate Electrical Load Profiles using the pre-trained model
-
-2. Train a new model
-
-3. Reconstruct Residential Aggregate Electrical Load Profiles using the user-trained mode
+OPTION #3
 
 If option number 3 is selected, the software performs the same steps as in option 1, but using a different model trained via option 2. In the current repository, there is a model obtained (via option 2) from input training data similar to that in [1].
-
 The results obtained are similar to those of the previous example, but differ in that they are obtained through a different model. Additionally, to provide a different example, the input data in the "Input Data" folder was slightly modified, as  Figure 4 shows.
 
 ![Fig_4.png](READme%20Figures%2FFig_4.png)
