@@ -23,8 +23,6 @@ class Plots:
         script_dir = os.path.dirname(__file__)  # Get the directory of the current script
         plots_dir = os.path.join(script_dir, "..", "plots")  # Navigate to the "plots" directory
         os.makedirs(plots_dir, exist_ok=True)  # Create the "plots" directory if it doesn't exist
-        plt.tight_layout()
-
         plt.savefig(os.path.join(plots_dir, "Normalized Average Monthly Consumption Profiles.png"))
 
     @staticmethod
@@ -60,6 +58,7 @@ class Plots:
         # Rotate X-axis labels on all subplots
         for ax in g.axes.flat:
             ax.tick_params(axis='x', labelrotation=0, labelsize=7)
+            plt.grid()
 
         # Further reduce the top margin to avoid title cutoff
         plt.subplots_adjust(top=0.9)

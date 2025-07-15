@@ -63,7 +63,7 @@ class RandomForest:
 
         toc = time.time()
 
-        print(toc-tic)
+        print(f"\nTraining Time Execution: {toc-tic}s")
         # Save the model with the best parameters
         self.model = grid_search.best_estimator_
 
@@ -79,8 +79,8 @@ class RandomForest:
         accuracy_train = self.model.score(self.X_train, self.y_train)
         self.accuracy_train_history.append(accuracy_train)
 
-        print("Accuracy on training set:", accuracy_train)
-        print("Accuracy on test set:", accuracy_test)
+        print("Accuracy on training set (%):", accuracy_train*100)
+        print("Accuracy on test set (%):", accuracy_test*100)
 
     def _save_model(self):
         # Save the trained model
@@ -88,7 +88,7 @@ class RandomForest:
         model_filename = os.path.join("..", model_folder, "random_forest_model.joblib")
         dump(self.model, model_filename)
 
-        print(f"Model saved to {model_filename}")
+        print(f"\nModel saved to {model_filename}")
 
         # Save accuracy history to a text file
         metrics_folder = os.path.join("..", "docs", "User-trained Model Metrics")
@@ -96,15 +96,15 @@ class RandomForest:
 
         metrics_filename = os.path.join(metrics_folder, "User_trained_model_metrics.txt")
         with open(metrics_filename, "w") as file:
-            file.write("Training Accuracy:\n")
+            file.write("-----------------------------\nTraining Accuracy (%):\n")
             for accuracy in self.accuracy_train_history:
-                file.write(f"{accuracy}\n")
+                file.write(f"{accuracy*100}\n")
 
-            file.write("\nTesting Accuracy:\n")
+            file.write("-----------------------------\n\nTesting Accuracy (%):\n")
             for accuracy in self.accuracy_test_history:
-                file.write(f"{accuracy}\n")
+                file.write(f"{accuracy*100}\n")
 
-        print(f"Accuracy history saved to {metrics_filename}")
+        print(f"\n ~ Accuracy history saved to {metrics_filename}")
 
     def _plot_feature_importance(self):
         # Plot and save feature importance
